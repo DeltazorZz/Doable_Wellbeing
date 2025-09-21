@@ -1,0 +1,7 @@
+rootProject.name = 'doablewellbeing-backend'
+
+
+include 'doablewellbeing-api'
+include 'doablewellbeing-data'
+include 'doablewellbeing-logic'
+

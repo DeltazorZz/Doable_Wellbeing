@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dw-postgres
+    environment:
+      POSTGRES_DB: doablewellbeing
+      POSTGRES_USER: dw
+      POSTGRES_PASSWORD: dwpass
+      TZ: UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dw -d doablewellbeing"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
