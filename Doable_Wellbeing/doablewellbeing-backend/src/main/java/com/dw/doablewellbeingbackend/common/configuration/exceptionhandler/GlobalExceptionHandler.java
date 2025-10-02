@@ -1,6 +1,8 @@
 package com.dw.doablewellbeingbackend.common.configuration.exceptionhandler;
 
 import com.dw.doablewellbeingbackend.common.exception.ConflictException;
+import com.dw.doablewellbeingbackend.common.exception.ForbiddenException;
+import com.dw.doablewellbeingbackend.common.exception.MethodArgumentNotValidException;
 import com.dw.doablewellbeingbackend.common.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +24,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
     }
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<?> invalid(MethodArgumentNotValidException ex) {
-//        return ResponseEntity.badRequest().body(Map.of("error", "Validation failed"));
-//    }
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> forbidden(ForbiddenException ex){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", ex.getMessage()));
+    }
+
+   @ExceptionHandler(MethodArgumentNotValidException.class)
+   public ResponseEntity<?> invalid(MethodArgumentNotValidException ex) {
+        return ResponseEntity.badRequest().body(Map.of("error", "Validation failed"));
+    }
 
 
 }

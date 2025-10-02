@@ -77,7 +77,7 @@ END$$;
 -- Core Users
 -- ===========
 CREATE TABLE IF NOT EXISTS users (
-                                     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     email varchar NOT NULL UNIQUE,
     password_hash varchar NOT NULL,
 
@@ -102,7 +102,7 @@ CREATE INDEX IF NOT EXISTS ix_users_name ON users (last_name, first_name);
 
 -- Címek
 CREATE TABLE IF NOT EXISTS user_addresses (
-                                              id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     line1 varchar NOT NULL,
     line2 varchar,
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS roles (
 );
 
 CREATE TABLE IF NOT EXISTS user_roles (
-                                          user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     role_id int NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
     created_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (user_id, role_id)
@@ -177,7 +177,7 @@ CREATE INDEX IF NOT EXISTS ix_consents_user_type ON consents (user_id, type, gra
 -- Self-referral form snapshot
 -- =========================================
 CREATE TABLE IF NOT EXISTS self_referrals (
-                                              id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
 
@@ -241,7 +241,7 @@ CREATE INDEX IF NOT EXISTS ix_self_referrals_postcode ON self_referrals (postcod
 -- Coaching & Appointments
 -- ==========================
 CREATE TABLE IF NOT EXISTS coaches (
-                                       user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     bio text,
     expertise text,
 --  hourly_rate int,
@@ -249,7 +249,7 @@ CREATE TABLE IF NOT EXISTS coaches (
     );
 
 CREATE TABLE IF NOT EXISTS clients (
-                                       user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE
+    user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE
     );
 
 CREATE TABLE IF NOT EXISTS coach_availabilities (
@@ -265,7 +265,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_coach_availability_slot
     ON coach_availabilities (coach_id, weekday, start_time, end_time);
 
 CREATE TABLE IF NOT EXISTS appointments (
-                                            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     coach_id uuid NOT NULL REFERENCES coaches(user_id) ON DELETE RESTRICT,
     client_id uuid NOT NULL REFERENCES clients(user_id) ON DELETE RESTRICT,
     starts_at timestamptz NOT NULL,

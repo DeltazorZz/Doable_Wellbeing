@@ -1,10 +1,10 @@
 package com.dw.doablewellbeingbackend.controller;
 
-import com.dw.doablewellbeingbackend.business.*;
-import com.dw.doablewellbeingbackend.domain.CreateUserRequest;
-import com.dw.doablewellbeingbackend.domain.CreateUserResponse;
-import com.dw.doablewellbeingbackend.domain.UpdateUserRequest;
-import com.dw.doablewellbeingbackend.domain.User;
+import com.dw.doablewellbeingbackend.business.userUseCases.*;
+import com.dw.doablewellbeingbackend.domain.user.CreateUserRequest;
+import com.dw.doablewellbeingbackend.domain.user.CreateUserResponse;
+import com.dw.doablewellbeingbackend.domain.user.UpdateUserRequest;
+import com.dw.doablewellbeingbackend.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
