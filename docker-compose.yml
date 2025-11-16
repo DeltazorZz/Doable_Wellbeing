@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: dw-db
+    restart: always
+    environment:
+      POSTGRES_USER: dw
+      POSTGRES_PASSWORD: dwpass 
+      POSTGRES_DB: doablewellbeing
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" 
+    networks:
+      - dw-net
+
+  backend:
+    image: deltazorzz/dw-backend:latest
+    container_name: dw-backend
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/doablewellbeing
+      SPRING_DATASOURCE_USERNAME: dw
+      SPRING_DATASOURCE_PASSWORD: dwpass
+      JWT_SECRET: Xx4pZ7fM9tG2nRkJ0bVq1uLhWcDyS8eT5mPaN3rQjFzYlKoC6sBdUvEiHwAgOIx
+      CORS_ALLOWED_ORIGINS: http://localhost:3000
+    ports:
+      - "8080:8080"
+    networks:
+      - dw-net
+
+  frontend:
+    image: deltazorzz/dw-frontend:latest
+    container_name: dw-frontend
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: "http://localhost:8080"
+    ports:
+      - "3000:3000"
+    networks:
+      - dw-net
+
+networks:
+  dw-net:
+
+volumes:
+  db-data:
