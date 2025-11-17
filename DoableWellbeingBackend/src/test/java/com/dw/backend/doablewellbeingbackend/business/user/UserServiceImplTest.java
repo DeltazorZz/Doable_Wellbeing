@@ -71,8 +71,8 @@ class UserServiceImplTest {
 
         assertThat(appUser.getId()).isEqualTo(e.getId());
         assertThat(appUser.getEmail()).isEqualTo(email);
-        assertThat(appUser.getFirstName()).isEqualTo("Bob");
-        assertThat(appUser.getLastName()).isEqualTo("Builder");
+        assertThat(appUser.getFirstName()).isEqualTo("Jane");
+        assertThat(appUser.getLastName()).isEqualTo("Doe");
         assertThat(appUser.getPasswordHash()).isEqualTo("hash");
         assertThat(appUser.isActive()).isTrue();
         assertThat(appUser.isDeleted()).isFalse();
@@ -192,8 +192,8 @@ class UserServiceImplTest {
                 .containsExactly("user");
 
         assertThat(appUser.getEmail()).isEqualTo(email);
-        assertThat(appUser.getFirstName()).isEqualTo("Alice");
-        assertThat(appUser.getLastName()).isEqualTo("Smith");
+        assertThat(appUser.getFirstName()).isEqualTo("Jane");
+        assertThat(appUser.getLastName()).isEqualTo("Doe");
         assertThat(appUser.getPasswordHash()).isEqualTo(hash);
         assertThat(appUser.getRoleNames()).containsExactly("user");
         assertThat(appUser.getPasswordSalt())

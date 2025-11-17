@@ -12,7 +12,7 @@ public class AppointmentMapper {
                 .clientId(e.getClientId())
                 .startsAt(e.getStartsAt())
                 .endsAt(e.getEndsAt())
-                .status(e.getStatus().name())
+                .status(e.getStatus())
                 .notes(e.getNotes())
                 .build();
         }

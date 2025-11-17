@@ -26,9 +26,9 @@ jobs:
         working-directory: DoableWellbeingBackend
         run: chmod +x ./gradlew
 
-#      - name: Run backend tests
-#        working-directory: DoableWellbeingBackend
-#        run: ./gradlew test --no-daemon
+      - name: Run backend tests
+        working-directory: DoableWellbeingBackend
+        run: ./gradlew test --no-daemon
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3

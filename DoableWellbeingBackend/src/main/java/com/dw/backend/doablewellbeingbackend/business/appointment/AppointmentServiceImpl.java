@@ -57,7 +57,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 //                                            //
     @Transactional
     public void clientCancel(UUID clientId, UUID id){
-        var appt = appointmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Appointment not found"));
+        var appt = appointmentRepository.findById(id).orElseThrow(() -> new NotFoundException("Appointment not found"));
         if(!appt.getClientId().equals(clientId)) throw new ForbiddenException("Not your appointment");
 
         appt.setStatus(AppointmentStatus.cancelled);
@@ -69,7 +69,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Transactional
     public void coachCancel(UUID coachId, UUID id){
-        var appt = appointmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Appointment not found"));
+        var appt = appointmentRepository.findById(id).orElseThrow(() -> new NotFoundException("Appointment not found"));
         if(!appt.getCoachId().equals(coachId)) throw new ForbiddenException("Not your appointment");
 
         appt.setStatus(AppointmentStatus.cancelled);
