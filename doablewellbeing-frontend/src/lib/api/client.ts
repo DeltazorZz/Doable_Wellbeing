@@ -1,23 +1,25 @@
 import type { AxiosRequestConfig, Method } from "axios";
-import { api } from "./axios";
-export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+import { api } from "./api";
 
-interface RequestOptions <Tbody= unknown>{
+export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+
+interface RequestOptions<Tbody = unknown>{
     method: HttpMethod;
     url: string;
     body?: Tbody;
     config?: AxiosRequestConfig;
 }
 
-export async function request<Tresponse= unknown, Tbody= unknown>(
+export async function request<Tresponse = unknown, Tbody = unknown>(
     options: RequestOptions<Tbody>
 ): Promise<Tresponse> {
     const { method, url, body, config } = options;
-const res = await api.request<Tresponse>({
-    method: method as Method,
-    url,
-    data: body,
-    ...config,
-});
-return res.data;    
+
+    const res = await api.request<Tresponse>({
+        method: method as Method,
+        url,
+        data: body,
+        ...config,
+    });
+    return res.data;
 }

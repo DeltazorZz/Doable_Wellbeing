@@ -1,15 +1,14 @@
 package com.dw.backend.doablewellbeingbackend.business.appointment;
 
-import com.dw.backend.doablewellbeingbackend.common.configuration.GlobalExceptionHandler;
 import com.dw.backend.doablewellbeingbackend.common.exception.ForbiddenException;
 import com.dw.backend.doablewellbeingbackend.common.exception.NotFoundException;
 import com.dw.backend.doablewellbeingbackend.domain.appointment.AppointmentView;
 import com.dw.backend.doablewellbeingbackend.domain.appointment.CreateAppointmentRequest;
 import com.dw.backend.doablewellbeingbackend.domain.enums.AppointmentStatus;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.AppointmentEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.CoachEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.AppointmentRepository;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.CoachRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.AppointmentEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.CoachEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.AppointmentRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.CoachRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

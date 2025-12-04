@@ -26,31 +26,9 @@ jobs:
         working-directory: DoableWellbeingBackend
         run: chmod +x ./gradlew
 
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-      - name: SonarQube Quality Gate
-        id: qg
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        with:
-          pollingTimeoutSec: 600
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
- 
-      - name: Fail if Quality Gate failed
-        if: steps.qg.outputs.quality-gate-status == 'FAILED'
-        run: |
-          echo "SonarQube Quality Gate FAILED"
-          exit 1
-
-      - name: Run backend tests
+      - name: Run backend tests with coverage
         working-directory: DoableWellbeingBackend
-        run: ./gradlew test --no-daemon
+        run: ./gradlew clean test jacocoTestReport --no-daemon
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3

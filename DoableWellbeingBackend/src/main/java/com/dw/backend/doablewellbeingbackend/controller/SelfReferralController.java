@@ -1,6 +1,5 @@
 package com.dw.backend.doablewellbeingbackend.controller;
 
-//import com.dw.doablewellbeingbackend.business.selfReferralUseCases.CreateSelfReferralUseCase;
 
 import com.dw.backend.doablewellbeingbackend.business.selfReferral.SelfReferralService;
 import com.dw.backend.doablewellbeingbackend.domain.selfreferral.CreateSelfReferralRequest;
@@ -28,7 +27,7 @@ public class SelfReferralController {
 
     @GetMapping("/status")
     public SelfReferralStatusResponse status(@AuthenticationPrincipal Jwt jwt) {
-        UUID userId = UUID.fromString(jwt.getSubject()); // vagy: UUID.fromString(jwt.getClaimAsString("user_id"))
+        UUID userId = UUID.fromString(jwt.getSubject());
         return selfrefService.getStatus(userId);
     }
 

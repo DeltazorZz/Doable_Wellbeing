@@ -52,16 +52,28 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers(
-                                "/auth/login", "/auth/register", "/auth/refresh", "/auth/logout"
+                                "/auth/login", "/auth/register", "/auth/refresh", "/auth/logout", "auth/registerCoach"
                         )
                 )
                 .cors(cors -> {})
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger/**", "/api-docs/**", "/v3/api-docs/**",
-                                "/actuator/health", "/actuator/info", "/error").permitAll()
+                        .requestMatchers(
+                                "/swagger/**",
+                                "/api-docs/**",
+                                "/v3/api-docs/**",
+                                "/actuator/health",
+                                "/actuator/info",
+                                "/error"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register", "/auth/refresh", "/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/auth/login",
+                                "/auth/refresh",
+                                "/auth/logout",
+                                "/auth/register",
+                                "/auth/registerCoach"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth -> oauth
@@ -148,7 +160,7 @@ public class SecurityConfig {
     private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter delegate = new JwtGrantedAuthoritiesConverter();
         delegate.setAuthoritiesClaimName(rolesClaim);
-        delegate.setAuthorityPrefix("ROLE_");
+        delegate.setAuthorityPrefix("role_");
 
         return jwt -> {
             var authorities = delegate.convert(jwt);

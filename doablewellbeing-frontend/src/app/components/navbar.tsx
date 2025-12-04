@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import { api } from "@/lib/api"; 
+import { api } from "@/lib/api/api"; 
 
 type User = {
   userId: string;
@@ -64,15 +64,18 @@ export default function Navbar({
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
 
-  // extra menüpontok bejelentkezve
-  const extraNav = [
+  const extraNav: { href: string; label: string }[] = [];
+  
+  if (user?.roles?.includes("user")) {
+  extraNav.push( 
     { href: "/dashboard", label: "Dashboard" },
     { href: "/habits", label: "Habits" },
     { href: "/appointments", label: "Appointments" },
-  ];
+  );
+}
 
-  if (user?.roles?.includes("admin")) {
-    extraNav.push({ href: "/admin", label: "Admin" });
+  if (user?.roles?.includes("coach")) {
+    extraNav.push({ href: "/home", label: "Coach" });
   }
 
   return (

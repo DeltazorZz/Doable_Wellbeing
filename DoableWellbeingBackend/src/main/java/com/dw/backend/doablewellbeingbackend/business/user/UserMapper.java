@@ -2,7 +2,7 @@ package com.dw.backend.doablewellbeingbackend.business.user;
 
 
 import com.dw.backend.doablewellbeingbackend.domain.user.User;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.UserEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.UserEntity;
 
 final class UserMapper {
     static User toDomain(UserEntity e) {

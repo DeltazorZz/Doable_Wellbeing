@@ -14,8 +14,6 @@ import java.util.UUID;
 public class CreateAppointmentRequest {
     @NotNull
     private UUID coachId;
-    @NotNull
-    private UUID clientId;
     @NotNull private OffsetDateTime startsAt;
     @NotNull private OffsetDateTime endsAt;
     private String notes;

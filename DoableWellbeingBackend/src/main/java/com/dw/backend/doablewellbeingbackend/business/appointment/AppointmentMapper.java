@@ -2,10 +2,12 @@ package com.dw.backend.doablewellbeingbackend.business.appointment;
 
 
 import com.dw.backend.doablewellbeingbackend.domain.appointment.AppointmentView;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.AppointmentEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.AppointmentEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AppointmentMapper {
-    static AppointmentView toView(AppointmentEntity e) {
+    public AppointmentView toView(AppointmentEntity e) {
         return AppointmentView.builder()
                 .id(e.getId())
                 .coachId(e.getCoachId())
@@ -14,6 +16,8 @@ public class AppointmentMapper {
                 .endsAt(e.getEndsAt())
                 .status(e.getStatus())
                 .notes(e.getNotes())
+                .meetingUrl(e.getMeetingUrl())
+                .confirmedAt(e.getConfirmedAt())
                 .build();
         }
 }

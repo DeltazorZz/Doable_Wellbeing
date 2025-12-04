@@ -1,18 +1,17 @@
 package com.dw.backend.doablewellbeingbackend.controller;
 
-
+import com.dw.backend.doablewellbeingbackend.business.appointment.AppointmentMapper;
 import com.dw.backend.doablewellbeingbackend.business.appointment.AppointmentService;
 import com.dw.backend.doablewellbeingbackend.domain.appointment.AppointmentView;
-import com.dw.backend.doablewellbeingbackend.domain.appointment.CreateAppointmentRequest;
-import com.dw.backend.doablewellbeingbackend.domain.appointment.SessionNoteRequest;
+import com.dw.backend.doablewellbeingbackend.domain.appointment.BookFromSlotRequest;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.AppointmentEntity;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.UUID;
 
 @SecurityRequirement(name = "bearerAuth")
@@ -21,37 +20,51 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AppointmentController {
 
-    private final AppointmentService  appointmentService;
+    private final AppointmentService appointmentService;
+    private final AppointmentMapper mapper;
 
-    @PostMapping
-    public AppointmentView create(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody CreateAppointmentRequest req) {
-        UUID clientId = UUID.fromString(jwt.getSubject());
-        return appointmentService.create(clientId, req);
+    private UUID currentUserId(Jwt jwt) {
+        return UUID.fromString(jwt.getSubject());
     }
 
-    @GetMapping("/me")
-    public List<AppointmentView> myAppointments(@AuthenticationPrincipal Jwt jwt){
-        UUID clientId = UUID.fromString(jwt.getSubject());
-        return appointmentService.forClient(clientId);
+
+    @PreAuthorize("hasRole('coach')")
+    @PatchMapping("/{id}/confirm")
+    public AppointmentView confirm(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        var coachId = currentUserId(jwt);
+        AppointmentEntity appt = appointmentService.confirmAppointment(coachId, id);
+        return mapper.toView(appt);
     }
 
-    @PostMapping("/{id}/cancel")
-    public void clientCancel(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id){
-        UUID clientId = UUID.fromString(jwt.getSubject());
-        appointmentService.clientCancel(clientId, id);
+    @PreAuthorize("hasRole('coach')")
+    @PatchMapping("/{id}/decline")
+    public AppointmentView decline(@PathVariable UUID id,
+                                   @AuthenticationPrincipal Jwt jwt,
+                                   @RequestBody DeclineRequest body) {
+        var coachId = currentUserId(jwt);
+        AppointmentEntity appt = appointmentService.declineAppointment(id, coachId, body.reason());
+        return mapper.toView(appt);
     }
 
-    @PostMapping("/{id}/cancelbycoach")
-    public void coachCancel(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id){
-        UUID clientId = UUID.fromString(jwt.getSubject());
-        appointmentService.clientCancel(clientId, id);
+    public record DeclineRequest(String reason) {}
+
+    @PreAuthorize("hasAnyRole('user','client')")
+    @PostMapping("/slots/book")
+    public AppointmentView bookFromSlot(@Valid @RequestBody BookFromSlotRequest request,
+                                        @AuthenticationPrincipal Jwt jwt) {
+        UUID clientId = currentUserId(jwt);
+
+        AppointmentEntity appt = appointmentService.requestAppointmentFromSlot(
+                request.coachId(),
+                clientId,
+                request.slotStart(),
+                request.durationMinutes(),
+                request.notes()
+        );
+
+        return mapper.toView(appt);
     }
 
-    @PostMapping("/{id}/addnotes")
-    public void addNotes(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, @RequestBody SessionNoteRequest req){
-        UUID coachId =  UUID.fromString(jwt.getSubject());
-        appointmentService.addNote(coachId, id, req.getNote());
-    }
 
 
 }

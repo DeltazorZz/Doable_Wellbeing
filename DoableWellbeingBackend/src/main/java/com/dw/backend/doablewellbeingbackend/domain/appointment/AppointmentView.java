@@ -24,4 +24,6 @@ public class AppointmentView {
     private OffsetDateTime endsAt;
     private AppointmentStatus status;
     private String notes;
+    private String meetingUrl;
+    private OffsetDateTime confirmedAt;
 }

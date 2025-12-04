@@ -3,12 +3,13 @@ package com.dw.backend.doablewellbeingbackend.controller;
 import com.dw.backend.doablewellbeingbackend.domain.dashboard.DashboardDto;
 import com.dw.backend.doablewellbeingbackend.domain.dashboard.LayoutsDto;
 import com.dw.backend.doablewellbeingbackend.domain.dashboard.WidgetDto;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.UserModuleLayoutsEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.UserWidgetEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.UserModuleLayoutsRepository;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.UserWidgetRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.UserModuleLayoutsEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.UserWidgetEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.UserModuleLayoutsRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.UserWidgetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.service.RequestBodyService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -20,21 +21,21 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/dashboard")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('user', 'admin')")
 public class DashboardController {
 
     private final UserWidgetRepository widgetRepo;
     private final UserModuleLayoutsRepository layoutRepo;
     private final RequestBodyService requestBodyBuilder;
 
-    private UUID currentUserID(Jwt jwt) {
-        UUID userID = UUID.fromString(jwt.getSubject());
-        return userID;
+    private UUID currentUserId(Jwt jwt) {
+        return UUID.fromString(jwt.getSubject());
     }
 
 
     @GetMapping
     public DashboardDto get(@AuthenticationPrincipal Jwt jwt) {
-        UUID user_id = currentUserID(jwt);
+        UUID user_id = currentUserId(jwt);
         var layout = layoutRepo.findByUserIdAndName(user_id, "default")
                 .orElseGet(() -> {
                     var e = new UserModuleLayoutsEntity();
@@ -55,7 +56,7 @@ public class DashboardController {
 
     @PutMapping
     public DashboardDto put(@AuthenticationPrincipal Jwt jwt, @RequestBody DashboardDto body) {
-        UUID user_id = currentUserID(jwt);
+        UUID user_id = currentUserId(jwt);
         var layout = layoutRepo.findByUserIdAndName(user_id, body.name())
                 .orElseGet(() -> {
                     var e = new UserModuleLayoutsEntity();

@@ -7,8 +7,8 @@ import com.dw.backend.doablewellbeingbackend.domain.selfreferral.CreateSelfRefer
 import com.dw.backend.doablewellbeingbackend.domain.selfreferral.CreateSelfReferralResponse;
 import com.dw.backend.doablewellbeingbackend.domain.selfreferral.SelfReferralStatusResponse;
 import com.dw.backend.doablewellbeingbackend.domain.selfreferral.SelfReferralView;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.SelfReferralEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.*;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.SelfReferralEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

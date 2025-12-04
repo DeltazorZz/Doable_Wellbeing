@@ -1,4 +1,4 @@
-import CoachCardWithPlaceholder from "@/app/components/coachCard";
+import CoachCardWithPlaceholder from "@/app/components/ourMission/coachCard";
 import Navbar from "@/app/components/navbar";
 import React from "react";
 

@@ -1,10 +1,10 @@
 package com.dw.backend.doablewellbeingbackend.business.user;
 
 import com.dw.backend.doablewellbeingbackend.common.exception.NotFoundException;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.RoleEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.UserEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.RoleRepository;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.UserRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.RoleEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.UserEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.RoleRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

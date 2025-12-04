@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Google ###
+src/main/resources/google/google-service-account.json

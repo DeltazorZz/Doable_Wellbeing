@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/components/customButton.tsx",
+    "src/app/components/homePage/customButton.tsx",
     "src/**/*"
   ],
   "exclude": [

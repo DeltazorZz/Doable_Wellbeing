@@ -1,168 +1,210 @@
 package com.dw.backend.doablewellbeingbackend.business.appointment;
 
-
-import com.dw.backend.doablewellbeingbackend.common.exception.ConflictException;
-import com.dw.backend.doablewellbeingbackend.common.exception.ForbiddenException;
+import com.dw.backend.doablewellbeingbackend.business.google.GoogleMeetService;
+import com.dw.backend.doablewellbeingbackend.common.exception.AccessDeniedException;
 import com.dw.backend.doablewellbeingbackend.common.exception.NotFoundException;
-import com.dw.backend.doablewellbeingbackend.domain.appointment.AppointmentView;
-import com.dw.backend.doablewellbeingbackend.domain.appointment.CreateAppointmentRequest;
 import com.dw.backend.doablewellbeingbackend.domain.enums.AppointmentStatus;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.AppointmentEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.AppointmentRepository;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.CoachRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.AppointmentEntity;
+
+import com.dw.backend.doablewellbeingbackend.persistence.impl.AppointmentRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.CoachRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AppointmentServiceImpl implements AppointmentService {
 
-    private final AppointmentRepository appointmentRepository;
-    //private final SessionNoteRepository sessionNoteRepository;
-    //private final AuditService auditService;
-    //private final NotificationService notif;
-    private final BookingGuard bookingGuard;
+    private static final Set<Integer> ALLOWED_SLOT_DURATIONS = Set.of(120, 60, 45, 30, 15);
+    private static final List<AppointmentStatus> COUNT_AS_EXISTING = List.of(AppointmentStatus.SCHEDULED, AppointmentStatus.COMPLETED);
+
+    private final AppointmentRepository apptRepo;
     private final CoachRepository coachRepo;
-    //private final ClientRepository clientRepo;
+    private final UserRepository userRepo;
+    private final GoogleMeetService meetService;
 
 
-    //                           //
-    //Session note implementation//
-    //                           //
+    @Override
     @Transactional
-    public void addNote(UUID coachId, UUID appointmentId, String note) {
-        var appt = appointmentRepository.findById(appointmentId).orElseThrow();
-        if (!appt.getCoachId().equals(coachId)) throw new ForbiddenException("Not your appointment");
+    public AppointmentEntity requestAppointmentFromSlot(UUID coachId, UUID clientId, OffsetDateTime slotStart, int durationMinutes, String notes) {
+        if (!ALLOWED_SLOT_DURATIONS.contains(durationMinutes)) {
+            throw new IllegalArgumentException(
+                    "Invalid slot duration. Allowed values: 120, 60, 45, 30, 15 minutes."
+            );
+        }
 
-//        var entity = SessionNoteEntity.builder()
-//                .appointmentId(appointmentId)
-//                .coachId(coachId)
-//                .note(note)
-//                .build();
-//        sessionNoteRepository.save(entity);
-//        auditService.log(coachId, "session_note_added", "appointments", appointmentId, Map.of("noteId", entity.getId()));
+        OffsetDateTime slotEnd = slotStart.plusMinutes(durationMinutes);
 
+        return createAppointmentWithIntroLogic(
+                coachId,
+                clientId,
+                slotStart,
+                slotEnd,
+                notes
+        );
     }
 
-
-//                                            //
-// Change Appointment Status implementation//
-//                                            //
+    @Override
     @Transactional
-    public void clientCancel(UUID clientId, UUID id){
-        var appt = appointmentRepository.findById(id).orElseThrow(() -> new NotFoundException("Appointment not found"));
-        if(!appt.getClientId().equals(clientId)) throw new ForbiddenException("Not your appointment");
+    public AppointmentEntity confirmAppointment(UUID coachId, UUID appointmentId) {
+        AppointmentEntity appt = apptRepo.findById(appointmentId)
+                .orElseThrow(() -> new NotFoundException("Appointment not found"));
 
-        appt.setStatus(AppointmentStatus.cancelled);
-        appointmentRepository.save(appt);
+        if (!appt.getCoachId().equals(coachId)) {
+            throw new AccessDeniedException("You can only confirm your own appointments");
+        }
 
-//        notif.notifyAppointmentCancelled(appt.getCoachId(), clientId, id);
-//        auditService.log(clientId, "appointment_cancelled", "appointments", id, Map.of());
+        if (appt.getStatus() != AppointmentStatus.REQUESTED) {
+            throw new IllegalStateException("Only requested appointments can be confirmed");
+        }
+
+        try {
+            meetService.attachGoogleMeetToAppointment(appt);
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to create Google Meet link", ex);
+        }
+
+        appt.setStatus(AppointmentStatus.SCHEDULED);
+        appt.setConfirmedAt(OffsetDateTime.now());
+
+        return apptRepo.save(appt);
     }
 
+    @Override
     @Transactional
-    public void coachCancel(UUID coachId, UUID id){
-        var appt = appointmentRepository.findById(id).orElseThrow(() -> new NotFoundException("Appointment not found"));
-        if(!appt.getCoachId().equals(coachId)) throw new ForbiddenException("Not your appointment");
+    public AppointmentEntity declineAppointment(UUID coachId, UUID appointmentId, String reason) {
+        AppointmentEntity appt = apptRepo.findById(appointmentId)
+                .orElseThrow(() -> new NotFoundException("Appointment not found"));
 
-        appt.setStatus(AppointmentStatus.cancelled);
-        appointmentRepository.save(appt);
+        if (!appt.getCoachId().equals(coachId)) {
+            throw new AccessDeniedException("You can only decline your own appointments");
+        }
 
-//        notif.notifyAppointmentCancelled( coachId, appt.getClientId(), id);
-//        auditService.log(coachId, "appointment_cancelled", "appointments", id, Map.of());
+        if (appt.getStatus() != AppointmentStatus.REQUESTED) {
+            throw new IllegalStateException("Only requested appointments can be declined");
+        }
+
+        appt.setStatus(AppointmentStatus.DECLINED);
+
+        return apptRepo.save(appt);
     }
 
-    @Transactional
-    public void complete(UUID coachId, UUID id){
-        var appt = appointmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Appointment not found"));
-        if (!appt.getCoachId().equals(coachId)) throw new ForbiddenException("Not your appointment");
-
-
-        appt.setStatus(AppointmentStatus.completed);
-        appointmentRepository.save(appt);
-
-//        notif.notifyAppointmentCompleted(coachId, appt.getClientId(), id);
-//        auditService.log(coachId, "appointment_completed", "appointments", id, Map.of());
-    }
-
-    @Transactional
-    public void noShow(UUID coachId, UUID id){
-        var appt = appointmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Appointment not found"));
-        if(!appt.getCoachId().equals(coachId)) throw new ForbiddenException("Not your appointment");
-
-        appt.setStatus(AppointmentStatus.no_show);
-        appointmentRepository.save(appt);
-
-//        notif.notifyAppointmentNoShow(coachId, appt.getClientId(), id);
-//        auditService.log(coachId, "appointment_noShow", "appointments", id, Map.of());
-
-    }
-
-
-    //                                 //
-    //Create Appointment implementation//
-    //                                 //
-    @Transactional
-    public AppointmentView create(UUID clientId, CreateAppointmentRequest req) {
-        bookingGuard.assertUserCanBook(clientId);
-
-        var coach = coachRepo.findById(req.getCoachId())
+    private AppointmentEntity createAppointmentWithIntroLogic(UUID coachId, UUID clientId, OffsetDateTime startsAt, OffsetDateTime endsAt, String notes) {
+        var coach = coachRepo.findById(coachId)
                 .orElseThrow(() -> new NotFoundException("Coach not found"));
 
-        var overlaps = appointmentRepository.findOverlaps(coach.getUserId(), req.getStartsAt(), req.getEndsAt());
-        if (!overlaps.isEmpty()) {
-            throw new ConflictException("Coach already booked in this slot");
+        var client = userRepo.findById(clientId)
+                .orElseThrow(() -> new NotFoundException("Client not found"));
+
+        if (!endsAt.isAfter(startsAt)) {
+            throw new IllegalArgumentException("End time must be after start time");
+        }
+
+        boolean overlaps = apptRepo.existsOverlap(coachId, startsAt, endsAt);
+        if (overlaps) {
+            throw new IllegalStateException("Appointment overlaps with existing booking");
         }
 
 
+        boolean hasExistingSession = apptRepo.existsByCoachIdAndClientIdAndStatusIn(
+                coachId,
+                clientId,
+                COUNT_AS_EXISTING
+        );
 
-        var entity = AppointmentEntity.builder()
+        AppointmentEntity appt = AppointmentEntity.builder()
                 .coachId(coach.getUserId())
-                .clientId(clientId)
-                .startsAt(req.getStartsAt())
-                .endsAt(req.getEndsAt())
-                .status(AppointmentStatus.scheduled)
-                .notes(req.getNotes())
+                .clientId(client.getId())
+                .startsAt(startsAt)
+                .endsAt(endsAt)
+                .notes(notes)
                 .build();
 
-        entity = appointmentRepository.save(entity);
+        if (!hasExistingSession) {
 
-//        notif.notifyAppointmentScheduled(coach.getUserId(), clientId, entity.getId());
-//        auditService.log(clientId, "appointment_created", "appointments", entity.getId(), Map.of());
+            appt.setStatus(AppointmentStatus.REQUESTED);
+        } else {
 
+            appt.setStatus(AppointmentStatus.SCHEDULED);
+            appt.setConfirmedAt(OffsetDateTime.now());
 
-        return AppointmentMapper.toView(entity);
+            try {
+                meetService.attachGoogleMeetToAppointment(appt);
+            } catch (IOException ex) {
 
+                throw new RuntimeException("Failed to create Google Meet link", ex);
+            }
+        }
 
+        return apptRepo.save(appt);
     }
 
-    //                              //
-    //Get Appointment implementation//
-    //                              //
     @Override
-    public List<AppointmentView> forClient(UUID clientId) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<AppointmentEntity> getAppointmentsForClient(UUID clientId) {
+        return apptRepo.findByClientIdOrderByStartsAtDesc((clientId));
     }
 
     @Override
-    public List<AppointmentView> forCoach(UUID coachId) {
-        coachRepo.findById(coachId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coach not found: " + coachId));
-
-        return appointmentRepository
-                .findAllByCoachIdOrderByStartsAtDesc(coachId)
-                .stream()
-                .map(AppointmentMapper::toView)
-                .toList();
+    @Transactional(readOnly = true)
+    public List<AppointmentEntity> getAppointmentsForCoach(UUID coachId) {
+        return apptRepo.findByCoachIdOrderByStartsAtDesc((coachId));
     }
 
 
+    @Override
+    @Transactional
+    public AppointmentEntity cancelAppointmentAsClient(UUID clientId, UUID appointmentId) {
+        AppointmentEntity appt = apptRepo.findById(appointmentId)
+                .orElseThrow(() -> new NotFoundException("Appointment not found"));
 
+        if (!appt.getClientId().equals(clientId)) {
+            throw new AccessDeniedException("Not your appointment");
+        }
+
+        if (appt.getStatus() != AppointmentStatus.REQUESTED &&
+                appt.getStatus() != AppointmentStatus.SCHEDULED) {
+            throw new IllegalStateException("Only pending or scheduled appointments can be cancelled");
+        }
+
+        if (appt.getStartsAt().isBefore(OffsetDateTime.now())) {
+            throw new IllegalStateException("Cannot cancel past appointments");
+        }
+
+        appt.setStatus(AppointmentStatus.CANCELLED);
+
+        return apptRepo.save(appt);
+    }
+
+    @Override
+    @Transactional
+    public AppointmentEntity cancelAppointmentAsCoach(UUID coachId, UUID appointmentId) {
+        AppointmentEntity appt = apptRepo.findById(appointmentId)
+                .orElseThrow(() -> new NotFoundException("Appointment not found"));
+
+        if (!appt.getCoachId().equals(coachId)) {
+            throw new AccessDeniedException("Not your appointment");
+        }
+
+        if (appt.getStatus() != AppointmentStatus.REQUESTED &&
+                appt.getStatus() != AppointmentStatus.SCHEDULED) {
+            throw new IllegalStateException("Only pending or scheduled appointments can be cancelled");
+        }
+
+        if (appt.getStartsAt().isBefore(OffsetDateTime.now())) {
+            throw new IllegalStateException("Cannot cancel past appointments");
+        }
+
+        appt.setStatus(AppointmentStatus.CANCELLED);
+
+        return apptRepo.save(appt);
+    }
 }

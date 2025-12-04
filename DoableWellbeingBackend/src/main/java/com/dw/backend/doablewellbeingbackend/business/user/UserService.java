@@ -13,6 +13,8 @@ public interface UserService {
     // Create User
     //CreateUserResponse createUser(CreateUserRequest request);
     AppUser createUser(String email, String passwordHash, byte[] passwordSalt, String firstName, String lastName);
+    AppUser createCoach(String email, String passwordHash, byte[] passwordSalt, String firstName, String lastName);
+
 
     // Get User
     User getById(UUID id);

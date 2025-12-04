@@ -30,9 +30,13 @@ export function getDashboard() {
   });
 }
 
-/**
- * PUT /api/dashboard
- */
+export function fetchDashboard() {
+  return request<DashboardApiDto>({
+    method: "GET",
+    url: "/dashboard",
+  });
+}
+
 export function saveDashboard(dto: DashboardApiDto) {
   return request<DashboardApiDto, DashboardApiDto>({
     method: "PUT",

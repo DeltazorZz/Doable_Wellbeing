@@ -1,7 +1,7 @@
 package com.dw.backend.doablewellbeingbackend.business.selfReferral;
 
 import com.dw.backend.doablewellbeingbackend.domain.selfreferral.SelfReferralView;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.SelfReferralEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.SelfReferralEntity;
 
 final class SelfreferralMapper {
     static SelfReferralView toView(SelfReferralEntity e){

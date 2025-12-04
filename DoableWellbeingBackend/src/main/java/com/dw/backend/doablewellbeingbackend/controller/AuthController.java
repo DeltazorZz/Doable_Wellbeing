@@ -87,6 +87,20 @@ public class AuthController {
         return Map.of("userId", user.getId(), "email", user.getEmail());
 
     }
+    @PostMapping("/registerCoach")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, Object> registerCoach(@Valid @RequestBody RegisterRequest registerReq, HttpServletResponse response) {
+        if (userService.existsByEmail(registerReq.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        }
+
+        byte[] salt = hasher.generateSalt();
+        String hash = hasher.hash(registerReq.getPassword().toCharArray(), salt);
+        var user = userService.createCoach(registerReq.getEmail(), hash, salt, registerReq.getFirstName(), registerReq.getLastName());
+        setAuthCookies(response, user.getId(), user.getEmail(), user.getRoleNames());
+        return Map.of("userId", user.getId(), "email", user.getEmail());
+
+    }
 
     @PostMapping("/login")
     public Map<String, Object> login(@Valid @RequestBody LoginRequest loginReq, HttpServletResponse response) {
@@ -100,6 +114,7 @@ public class AuthController {
         setAuthCookies(response, user.getId(), user.getEmail(), user.getRoleNames());
         return Map.of("userId", user.getId(), "email", user.getEmail());
     }
+
 
     @PostMapping("/refresh")
     public Map<String, Object> refresh(@CookieValue(value = REFRESH_COOKIE, required = false) String refresh, HttpServletResponse response) {

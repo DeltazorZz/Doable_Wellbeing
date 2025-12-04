@@ -1,6 +1,6 @@
 "use client";
 
-import AuthForm from "@/app/components/AuthForm";
+import AuthForm from "@/app/components/login_register/AuthForm";
 
 
 

@@ -2,11 +2,12 @@ package com.dw.backend.doablewellbeingbackend.business.user;
 
 import com.dw.backend.doablewellbeingbackend.common.exception.NotFoundException;
 import com.dw.backend.doablewellbeingbackend.domain.user.*;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.RoleEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.entity.UserEntity;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.RoleRepository;
-import com.dw.backend.doablewellbeingbackend.presistence.impl.UserRepository;
-import com.dw.backend.doablewellbeingbackend.business.user.AppUserImpl;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.CoachEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.RoleEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.entity.UserEntity;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.CoachRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.RoleRepository;
+import com.dw.backend.doablewellbeingbackend.persistence.impl.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +23,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-
+    private final CoachRepository coachRepository;
 
 
     @Override
@@ -67,6 +68,42 @@ public class UserServiceImpl implements UserService {
 
         UserEntity saved = userRepository.save(u);
         return toAppUser(saved);
+    }
+
+    @Override
+    public AppUser createCoach(String email, String passwordHash, byte[] passwordSalt, String firstName, String lastName) {
+        Objects.requireNonNull(passwordHash, "passwordHash");
+        Objects.requireNonNull(passwordSalt, "passwordSalt");
+
+        // 1) User létrehozása
+        UserEntity u = new UserEntity();
+        u.setEmail(email);
+        u.setPasswordHash(passwordHash);
+        u.setPasswordSalt(passwordSalt.clone());
+        u.setFirstName(firstName == null ? "" : firstName.trim());
+        u.setLastName(lastName == null ? "" : lastName.trim());
+
+        if (u.getRoles() == null) {
+            u.setRoles(new HashSet<>());
+        }
+        RoleEntity coachRole = roleRepository.findByName("coach")
+                .orElseThrow(() -> new IllegalStateException("Missing ROLE seed: COACH"));
+        u.getRoles().add(coachRole);
+
+        UserEntity savedUser = userRepository.save(u);
+
+        // 2) Coach rekord létrehozása a coaches táblában
+        CoachEntity coach = CoachEntity.builder()
+                .user(savedUser)
+                .timezone("Europe/London")
+                .bio(null)
+                .expertise(null)
+                .build();
+
+        coachRepository.save(coach);
+
+        // 3) Visszatérés AppUser-ként
+        return toAppUser(savedUser);
     }
 
     // ----- Get User(s) -----

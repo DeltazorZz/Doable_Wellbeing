@@ -1,7 +1,6 @@
-// 📄 src/lib/auth-context.tsx
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/api";
 
 type User = {
   userId: string;
@@ -18,7 +17,7 @@ type AuthCtx = {
   signOut: () => Promise<void>;
 };
 
-// 🔹 EZ a "Ctx", amiről a hiba beszél
+
 const Ctx = createContext<AuthCtx | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -38,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await api.post("/auth/logout"); // vagy később /auth/logout
+      await api.post("/auth/logout"); 
     } finally {
       setUser(null);
     }
@@ -48,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refresh();
   }, []);
 
-  // 🔹 Itt van a Provider (a hiba erre vonatkozott)
+  
   return (
     <Ctx.Provider value={{ user, loading, refresh, signOut }}>
       {children}
@@ -56,8 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-
-// Helper hook, hogy kényelmes legyen az elérés
 export function useAuth() {
   const context = useContext(Ctx);
   if (!context) {

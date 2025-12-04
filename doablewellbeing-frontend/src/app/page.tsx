@@ -1,8 +1,8 @@
 'use client';
 import Image from 'next/image';
 import Navbar from './components/navbar';
-import RotatingQuestions from './components/rotatingQuestions';
-import CustomButton from './components/customButton';
+import RotatingQuestions from './components/homePage/rotatingQuestions';
+import CustomButton from './components/homePage/customButton';
 
 export default function Home() {
   return (

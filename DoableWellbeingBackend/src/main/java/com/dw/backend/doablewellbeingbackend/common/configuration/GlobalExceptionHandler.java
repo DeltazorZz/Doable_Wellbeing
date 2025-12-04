@@ -1,9 +1,6 @@
 package com.dw.backend.doablewellbeingbackend.common.configuration;
 
-import com.dw.backend.doablewellbeingbackend.common.exception.ConflictException;
-import com.dw.backend.doablewellbeingbackend.common.exception.ForbiddenException;
-import com.dw.backend.doablewellbeingbackend.common.exception.NotFoundException;
-import com.dw.backend.doablewellbeingbackend.common.exception.MethodArgumentNotValidException;
+import com.dw.backend.doablewellbeingbackend.common.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,6 +31,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(Map.of("error", "Validation failed"));
     }
 
+   @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> accessDenied(AccessDeniedException ex){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", ex.getMessage()));
+   }
 
 }
 
