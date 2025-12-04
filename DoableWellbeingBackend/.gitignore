@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### Google ###
-src/main/resources/google/google-service-account.json
+/src/main/resources/google/google-service-account.json
