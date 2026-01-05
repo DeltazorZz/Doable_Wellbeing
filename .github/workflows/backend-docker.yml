@@ -21,6 +21,7 @@ jobs:
           cache: gradle
 
       - name: Run tests + JaCoCo
+        working-directory: DoableWellbeingBackend
         run: ./gradlew clean test jacocoTestReport
 
       - name: SonarCloud analysis
