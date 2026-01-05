@@ -36,7 +36,7 @@ export function SessionOptions({
           onChange={(e) => setGoal(e.target.value)}
           rows={4}
           placeholder="e.g., I want to prepare for a stressful presentation next week."
-          className="w-full resize-y rounded-xl border border-gray-300 bg-white p-3 shadow-sm outline-none transition focus:border-gray-900"
+          className="w-full resize-y rounded-xl border border-gray-300 bg-white p-3 shadow-sm outline-none transition focus:border-gray-900 text-black"
         />
       </section>
 
@@ -67,7 +67,7 @@ export function SessionOptions({
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
             placeholder="Anything else you'd like your coach to know?"
-            className="mt-2 w-full resize-y rounded-xl border border-gray-300 bg-white p-3 shadow-sm outline-none transition focus:border-gray-900"
+            className="mt-2 w-full resize-y rounded-xl border border-gray-300 bg-white p-3 shadow-sm outline-none transition focus:border-gray-900 text-black"
           />
         )}
       </section>

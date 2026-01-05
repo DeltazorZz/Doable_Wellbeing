@@ -37,4 +37,5 @@ out/
 .vscode/
 
 ### Google ###
-C:\Users\vetka\Desktop\Doable\Doable_Wellbeing\DoableWellbeingBackend\src\main\resources\google
+src/main/resources/secrets/
+**/secrets/

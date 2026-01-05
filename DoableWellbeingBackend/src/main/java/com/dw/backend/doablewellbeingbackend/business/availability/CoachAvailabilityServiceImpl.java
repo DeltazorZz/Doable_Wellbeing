@@ -77,7 +77,7 @@ public class CoachAvailabilityServiceImpl implements CoachAvailabilityService {
         }
 
         availability.setActive(false);
-
+        availabilityRepository.save(availability);
         return toView(availability);
     }
 

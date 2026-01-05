@@ -10,20 +10,21 @@ group = 'com.dw.backend'
 version = '0.0.1-SNAPSHOT'
 description = 'DoableWellbeingBackend'
 
-sonar{
-    properties{
-        property "sonar.projectKey", "DoableWellbeing"
-        property "sonar.host.url", "http://localhost:9000"
-        property "sonar.token", "sqp_47ca7aa12094bbdee5da7868b621b441c7ac5e3c"
-        property "sonar.language", "java"
+sonar {
+    properties {
+
+        property "sonar.projectKey", "DeltazorZz_Doable_Wellbeing"
+        property "sonar.organization", "deltazorzz"
+        property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.sourceEncoding", "UTF-8"
         property "sonar.sources", "src/main/java"
         property "sonar.tests", "src/test/java"
         property "sonar.java.binaries", "build/classes/java/main"
+
+        // JUnit + JaCoCo
         property "sonar.junit.reportPaths", "build/test-results/test"
         property "sonar.coverage.jacoco.xmlReportPaths",
                 "build/reports/jacoco/test/jacocoTestReport.xml"
-
     }
 }
 
@@ -83,13 +84,15 @@ dependencies {
 
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:postgresql'
-    testImplementation 'org.mockito:mockito-core:5.14.2'
+    testImplementation platform("org.testcontainers:testcontainers-bom:1.21.3")
 
+    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation "org.testcontainers:postgresql"
+    testImplementation "org.testcontainers:testcontainers"
+    testImplementation "org.springframework.boot:spring-boot-testcontainers"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.springframework.security:spring-security-test"
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 

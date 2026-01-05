@@ -1,14 +1,13 @@
 'use client'
-import Dashboard from '@/app/components/dashboard/Dashboard'
+import { DashboardPage } from '@/app/components/dashboard/DashboardPage'
 import Navbar from '@/app/components/navbar'
 import React from 'react'
 
-export default function DashboardPage() {
+export default function Dashboard() {
   return (
     <div>  
       <Navbar />
-      
-      <Dashboard/>
+      <DashboardPage/>      
     </div>
   )
 }

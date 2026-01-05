@@ -20,9 +20,9 @@ export interface CoachAvailabilityResponse {
 
 
 export interface SlotView {
-  start: string; 
-  end: string;   
- 
+  id: string;
+  startsAt: string;
+  endsAt: string;
 }
 
 const subpath = "/api/coach/availabilities";
@@ -30,11 +30,16 @@ const subpath = "/api/coach/availabilities";
 export async function getCoachAvailabilitiesForDate(
   date: string
 ): Promise<CoachAvailabilityResponse[]> {
-  
-  const url = `/api/coach/availability/me`;
-  return await apiFetch<CoachAvailabilityResponse[]>(url);
-}
 
+  const params = new URLSearchParams({
+    from: date,
+    to: date,
+  }).toString();
+
+  return apiFetch<CoachAvailabilityResponse[]>(
+    `/api/coach/availabilities/me?${params}`
+  );
+}
 
 
 export async function createCoachAvailability(

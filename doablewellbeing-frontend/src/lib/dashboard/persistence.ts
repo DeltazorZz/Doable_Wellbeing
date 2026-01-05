@@ -1,7 +1,7 @@
 // lib/dashboard/persistence.ts
 import type { Layout } from "react-grid-layout";
 import { WidgetRegistry, type WidgetType, type WidgetInstance } from "@/app/components/widgets";
-import { getDashboard, saveDashboard as saveDashboardApi, type DashboardApiDto, type LayoutsApiDto, type WidgetApiDto, type Breakpoint, } from "@/lib/api/dashboard";
+import { getDashboard, saveDashboard as saveDashboardApi, type DashboardApiDto, type LayoutsApiDto, type WidgetApiDto, type Breakpoint, } from "@/lib/api/dashboardApi";
 export const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
 export const cols         = { lg: 12,   md: 10,  sm: 8,  xs: 6,   xxs: 4 };
 export type Layouts = Partial<Record<Breakpoint, Layout[]>>;

@@ -80,7 +80,7 @@ public class CoachAvailabilityController {
         availabilityService.deleteAvailability(coachId, availabilityId);
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAnyRole('user', 'coach', 'client')")
     @GetMapping("/{coachId}/slots")
     public List<SlotView> getSlotsForCoach(
             @PathVariable UUID coachId,

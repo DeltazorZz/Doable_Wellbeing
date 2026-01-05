@@ -5,10 +5,5 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class DeclineRequest {
-   private String reason;
-}
+public record DeclineRequest (String reason) {}

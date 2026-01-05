@@ -1,102 +1,80 @@
 package com.dw.backend.doablewellbeingbackend.controller;
-
-import com.dw.backend.doablewellbeingbackend.domain.dashboard.DashboardDto;
-import com.dw.backend.doablewellbeingbackend.domain.dashboard.LayoutsDto;
-import com.dw.backend.doablewellbeingbackend.domain.dashboard.WidgetDto;
-import com.dw.backend.doablewellbeingbackend.persistence.entity.UserModuleLayoutsEntity;
-import com.dw.backend.doablewellbeingbackend.persistence.entity.UserWidgetEntity;
-import com.dw.backend.doablewellbeingbackend.persistence.impl.UserModuleLayoutsRepository;
-import com.dw.backend.doablewellbeingbackend.persistence.impl.UserWidgetRepository;
+import com.dw.backend.doablewellbeingbackend.business.dashboard.DashboardService;
+import com.dw.backend.doablewellbeingbackend.domain.dashboard.CreateDashboardWidgetRequest;
+import com.dw.backend.doablewellbeingbackend.domain.dashboard.DashboardView;
+import com.dw.backend.doablewellbeingbackend.domain.dashboard.UpdatePlacementsRequest;
+import com.dw.backend.doablewellbeingbackend.domain.dashboard.UpdateWidgetSettingsRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.service.RequestBodyService;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/dashboard")
+@RequestMapping("/api/dashboards")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('user', 'admin')")
 public class DashboardController {
 
-    private final UserWidgetRepository widgetRepo;
-    private final UserModuleLayoutsRepository layoutRepo;
-    private final RequestBodyService requestBodyBuilder;
+    private final DashboardService dashboardService;
 
     private UUID currentUserId(Jwt jwt) {
         return UUID.fromString(jwt.getSubject());
     }
 
-
-    @GetMapping
-    public DashboardDto get(@AuthenticationPrincipal Jwt jwt) {
-        UUID user_id = currentUserId(jwt);
-        var layout = layoutRepo.findByUserIdAndName(user_id, "default")
-                .orElseGet(() -> {
-                    var e = new UserModuleLayoutsEntity();
-                    e.setUserId(user_id); e.setName("default");
-                    return layoutRepo.save(e);
-                });
-        var widgets = widgetRepo.findByUserIdAndActiveIsTrueOrderByCreatedAtAsc(user_id)
-                .stream().map(w -> new WidgetDto(
-                        w.getId(), w.getType(), w.getTitle(), w.getSettings()
-                )).toList();
-
-        return new DashboardDto("default",
-                new LayoutsDto(
-                        layout.getGridLg(), layout.getGridMd(), layout.getGridSm(),
-                        layout.getGridXs(), layout.getGridXxs()
-                ), widgets);
+    @PreAuthorize("hasAnyRole('user','client')")
+    @GetMapping("/default")
+    public DashboardView getDefault(@AuthenticationPrincipal Jwt jwt) {
+        UUID userId = currentUserId(jwt);
+        return dashboardService.getOrCreateDefaultDashboard(userId);
     }
 
-    @PutMapping
-    public DashboardDto put(@AuthenticationPrincipal Jwt jwt, @RequestBody DashboardDto body) {
-        UUID user_id = currentUserId(jwt);
-        var layout = layoutRepo.findByUserIdAndName(user_id, body.name())
-                .orElseGet(() -> {
-                    var e = new UserModuleLayoutsEntity();
-                    e.setUserId(user_id); e.setName(body.name());
-                    return e;
-                });
-        var l = body.layouts();
-        layout.setGridLg(Optional.ofNullable(l.lg()).orElse("[]"));
-        layout.setGridMd(Optional.ofNullable(l.md()).orElse("[]"));
-        layout.setGridSm(Optional.ofNullable(l.sm()).orElse("[]"));
-        layout.setGridXs(Optional.ofNullable(l.xs()).orElse("[]"));
-        layout.setGridXxs(Optional.ofNullable(l.xxs()).orElse("[]"));
-        layoutRepo.save(layout);
+    @PreAuthorize("hasAnyRole('user','client')")
+    @PostMapping("/{dashboardId}/widgets")
+    public Map<String, Object> addWidget(
+            @PathVariable UUID dashboardId,
+            @Valid @RequestBody CreateDashboardWidgetRequest request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID userId = currentUserId(jwt);
+        UUID widgetId = dashboardService.addWidget(userId, dashboardId, request);
+        return Map.of("widgetId", widgetId);
+    }
 
-        var existing = widgetRepo.findByUserIdAndActiveIsTrueOrderByCreatedAtAsc(user_id)
-                .stream().collect(Collectors.toMap(UserWidgetEntity::getId, Function.identity()));
+    @PreAuthorize("hasAnyRole('user','client')")
+    @PutMapping("/{dashboardId}/placements")
+    public Map<String, Object> updatePlacements(
+            @PathVariable UUID dashboardId,
+            @Valid @RequestBody UpdatePlacementsRequest request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        dashboardService.upsertPlacements(currentUserId(jwt), dashboardId, request);
+        return Map.of("status", "ok");
+    }
 
-        Set<UUID> seen = new HashSet<>();
-        List<WidgetDto> normalized = new ArrayList<>();
-        for(var w : body.widgets()) {
-            UserWidgetEntity e = w.id() != null ? existing.get(w.id()) : null;
-            if(e == null) e = new UserWidgetEntity();
-            e.setUserId(user_id);
-            e.setType(w.type());
-            e.setTitle(w.title());
-            e.setSettings(Optional.ofNullable(w.settings()).orElse("{}"));
-            e.setActive(true);
-            e = widgetRepo.save(e);
-            seen.add(e.getId());
-            normalized.add(new WidgetDto(e.getId(), e.getType(), e.getTitle(), e.getSettings()));
-        }
-        for (var e : existing.values()){
-            if (!seen.contains(e.getId())) {
-                e.setActive(false);
-                widgetRepo.save(e);
-            }
-        }
-        return new DashboardDto(layout.getName(),
-                new LayoutsDto(layout.getGridLg(), layout.getGridMd(), layout.getGridSm(),
-                        layout.getGridXs(), layout.getGridXxs()),
-                normalized);
+    @PreAuthorize("hasAnyRole('user','client')")
+    @PutMapping("/{dashboardId}/widgets/{widgetId}/settings")
+    public Map<String, Object> updateWidgetSettings(
+            @PathVariable UUID dashboardId,
+            @PathVariable UUID widgetId,
+            @Valid @RequestBody UpdateWidgetSettingsRequest request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        dashboardService.updateWidgetSettings(currentUserId(jwt), dashboardId, widgetId, request);
+        return Map.of("status", "ok");
+    }
+
+    @PreAuthorize("hasAnyRole('user','client')")
+    @DeleteMapping("/{dashboardId}/widgets/{widgetId}")
+    public Map<String, Object> deleteWidget(
+            @PathVariable UUID dashboardId,
+            @PathVariable UUID widgetId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        dashboardService.deleteWidget(currentUserId(jwt), dashboardId, widgetId);
+        return Map.of("status", "ok");
     }
 }

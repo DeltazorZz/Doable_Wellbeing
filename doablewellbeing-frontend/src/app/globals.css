@@ -34,3 +34,47 @@ body {
 .dw-drag-handle * {
   user-select: none;
 }
+
+/* Make FullCalendar look like your app */
+.fc {
+  font-family: inherit;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.fc .fc-button {
+  border-radius: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: white !important;
+  color: #0f172a !important;
+  font-size: 12px !important;
+  padding: 6px 10px !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background: #0f172a !important;
+  color: white !important;
+  border-color: #0f172a !important;
+}
+
+.fc .fc-timegrid-slot,
+.fc .fc-daygrid-day {
+  border-color: #eef2f7 !important;
+}
+
+/* Event base */
+.dw-event {
+  border-radius: 12px !important;
+  border: none !important;
+  padding: 2px 4px !important;
+}
+
+/* Status variants */
+.dw-event--requested { background: rgba(245, 158, 11, 0.85) !important; }
+.dw-event--scheduled { background: rgba(16, 185, 129, 0.85) !important; }
+.dw-event--completed { background: rgba(100, 116, 139, 0.85) !important; }
+.dw-event--negative  { background: rgba(244, 63, 94, 0.85) !important; }

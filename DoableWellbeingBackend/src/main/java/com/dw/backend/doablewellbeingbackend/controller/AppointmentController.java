@@ -4,6 +4,8 @@ import com.dw.backend.doablewellbeingbackend.business.appointment.AppointmentMap
 import com.dw.backend.doablewellbeingbackend.business.appointment.AppointmentService;
 import com.dw.backend.doablewellbeingbackend.domain.appointment.AppointmentView;
 import com.dw.backend.doablewellbeingbackend.domain.appointment.BookFromSlotRequest;
+import com.dw.backend.doablewellbeingbackend.domain.appointment.InstantBookRequest;
+import com.dw.backend.doablewellbeingbackend.domain.dashboard.AddAppointmentNoteRequest;
 import com.dw.backend.doablewellbeingbackend.persistence.entity.AppointmentEntity;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -12,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 import java.util.UUID;
 
 @SecurityRequirement(name = "bearerAuth")
@@ -28,30 +32,10 @@ public class AppointmentController {
     }
 
 
-    @PreAuthorize("hasRole('coach')")
-    @PatchMapping("/{id}/confirm")
-    public AppointmentView confirm(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
-        var coachId = currentUserId(jwt);
-        AppointmentEntity appt = appointmentService.confirmAppointment(coachId, id);
-        return mapper.toView(appt);
-    }
-
-    @PreAuthorize("hasRole('coach')")
-    @PatchMapping("/{id}/decline")
-    public AppointmentView decline(@PathVariable UUID id,
-                                   @AuthenticationPrincipal Jwt jwt,
-                                   @RequestBody DeclineRequest body) {
-        var coachId = currentUserId(jwt);
-        AppointmentEntity appt = appointmentService.declineAppointment(id, coachId, body.reason());
-        return mapper.toView(appt);
-    }
-
-    public record DeclineRequest(String reason) {}
 
     @PreAuthorize("hasAnyRole('user','client')")
     @PostMapping("/slots/book")
-    public AppointmentView bookFromSlot(@Valid @RequestBody BookFromSlotRequest request,
-                                        @AuthenticationPrincipal Jwt jwt) {
+    public AppointmentView bookFromSlot(@Valid @RequestBody BookFromSlotRequest request, @AuthenticationPrincipal Jwt jwt) {
         UUID clientId = currentUserId(jwt);
 
         AppointmentEntity appt = appointmentService.requestAppointmentFromSlot(
@@ -63,6 +47,37 @@ public class AppointmentController {
         );
 
         return mapper.toView(appt);
+    }
+
+    @PreAuthorize("hasAnyRole('user','client')")
+    @PostMapping("/dev/instant-book")
+    public AppointmentView instantBookFromSlot(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody @Valid InstantBookRequest request
+    ) {
+        UUID clientId = currentUserId(jwt);
+
+        var appt = appointmentService.instantBookFromSlot(
+                request.coachId(),
+                clientId,
+                request.slotStart(),
+                request.durationMinutes(),
+                request.notes()
+        );
+
+        return mapper.toView(appt);
+    }
+
+    @PreAuthorize("hasAnyRole('coach','admin')")
+    @PostMapping("/{appointmentId}/notes")
+    public Map<String,Object> addNote(
+            @PathVariable UUID appointmentId,
+            @RequestBody AddAppointmentNoteRequest req,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID coachId = UUID.fromString(jwt.getSubject());
+        appointmentService.addNote(coachId, appointmentId, req);
+        return Map.of("status","ok");
     }
 
 

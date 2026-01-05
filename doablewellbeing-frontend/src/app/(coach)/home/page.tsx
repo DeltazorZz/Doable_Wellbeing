@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import Navbar from "@/app/components/navbar";
-import { OverviewTab } from "@/app/components/coach/OverviewTab";
-import { AvailabilityTab } from "@/app/components/coach/AvailabilityTab";
+import { AvailabilityTab } from "@/app/components/coach/Availability/AvailabilityTab";
+import { CoachCalendar } from "@/app/components/coach/Overview/CoachCalendar";
+
 
 export default function CoachPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "availability">(
@@ -13,7 +14,6 @@ export default function CoachPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar />
-
       <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 lg:px-8 lg:py-8">
         <header className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
@@ -53,7 +53,7 @@ export default function CoachPage() {
           </div>
         </header>
 
-        {activeTab === "overview" && <OverviewTab />}
+        {activeTab === "overview" && <CoachCalendar />}
         {activeTab === "availability" && <AvailabilityTab />}
       </main>
     </div>

@@ -19,6 +19,7 @@ import java.util.UUID;
 @Table(name = "appointments")
 public class AppointmentEntity {
     @Id
+    @Column(columnDefinition = "uuid")
     private UUID id;
 
     @JoinColumn(name = "coach_id")
@@ -49,4 +50,7 @@ public class AppointmentEntity {
 
     @Column(name = "confirmed_at")
     private OffsetDateTime confirmedAt;
+
+    @PrePersist
+    void pre() { if (id == null) id = UUID.randomUUID(); }
 }

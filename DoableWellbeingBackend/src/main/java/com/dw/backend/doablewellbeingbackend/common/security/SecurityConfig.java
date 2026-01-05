@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers(
-                                "/auth/login", "/auth/register", "/auth/refresh", "/auth/logout", "auth/registerCoach"
+                                "/auth/login", "/auth/register", "/auth/refresh", "/auth/logout", "auth/registerCoach", "/csrf-token","/admin/google/oauth/**"
                         )
                 )
                 .cors(cors -> {})
@@ -74,6 +74,7 @@ public class SecurityConfig {
                                 "/auth/register",
                                 "/auth/registerCoach"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/csrf-token","/admin/google/oauth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth -> oauth
@@ -81,7 +82,7 @@ public class SecurityConfig {
                                 .decoder(jwtDecoder())
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
-                        .bearerTokenResolver(bearerTokenResolver()) // <---
+                        .bearerTokenResolver(bearerTokenResolver())
                 )
                 .httpBasic(b -> b.disable())
                 .formLogin(fl -> fl.disable())
@@ -136,7 +137,7 @@ public class SecurityConfig {
 
             keyBytes = hs256SecretB64.getBytes(StandardCharsets.UTF_8);
         }
-        if (keyBytes.length < 32) { // 256 bit
+        if (keyBytes.length < 32) {
             throw new IllegalStateException("JWT secret too weak. Provide at least 256-bit key (Base64).");
         }
 
@@ -160,7 +161,7 @@ public class SecurityConfig {
     private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter delegate = new JwtGrantedAuthoritiesConverter();
         delegate.setAuthoritiesClaimName(rolesClaim);
-        delegate.setAuthorityPrefix("role_");
+        delegate.setAuthorityPrefix("ROLE_");
 
         return jwt -> {
             var authorities = delegate.convert(jwt);
@@ -179,7 +180,7 @@ public class SecurityConfig {
                 if (request.getCookies() == null) return null;
                 for (var c : request.getCookies()) {
                     if ("dw_access".equals(c.getName())) {
-                        return c.getValue(); // ez lesz a Bearer token
+                        return c.getValue();
                     }
                 }
                 return null;

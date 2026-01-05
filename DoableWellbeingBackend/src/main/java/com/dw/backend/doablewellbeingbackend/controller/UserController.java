@@ -63,14 +63,14 @@ public class UserController {
         );
     }
 
-    @GetMapping("/appointment/me")
-    public List<AppointmentView> getMyAppointments(@AuthenticationPrincipal Jwt jwt) {
-        UUID clientId = currentUserId(jwt);
-        return appointmentService.getAppointmentsForClient(clientId)
-                .stream()
-                .map(appointmentMapper::toView)
-                .toList();
-    }
+//    @GetMapping("/appointment/upcoming")
+//    public List<AppointmentView> getMyAppointments(@AuthenticationPrincipal Jwt jwt) {
+//        UUID clientId = currentUserId(jwt);
+//        return appointmentService.findUpcomingForClient(clientId)
+//                .stream()
+//                .map(appointmentMapper::toView)
+//                .toList();
+//    }
 
     @PatchMapping("/appointment/{id}/cancel")
     public AppointmentView cancelMyAppointment(

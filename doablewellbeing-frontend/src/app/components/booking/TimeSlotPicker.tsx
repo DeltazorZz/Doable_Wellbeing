@@ -28,10 +28,10 @@ export function TimeSlotPicker({
   return (
     <div className="flex flex-wrap gap-2">
       {slots.map((s) => {
-        const isPicked = pickedSlot?.start === s.start;
+        const isPicked = pickedSlot?.startsAt === s.startsAt;
         return (
           <button
-            key={s.start}
+            key={s.startsAt}
             type="button"
             onClick={() => onPickSlot(s)}
             className={
@@ -42,7 +42,7 @@ export function TimeSlotPicker({
             }
             aria-pressed={isPicked}
           >
-            {fmtTime(s.start)} – {fmtTime(s.end)}
+            {fmtTime(s.startsAt)} – {fmtTime(s.endsAt)}
           </button>
         );
       })}
