@@ -1,6 +1,7 @@
 package com.dw.backend.doablewellbeingbackend.it.e2e;
 
 import com.dw.backend.doablewellbeingbackend.business.google.GoogleCalendarService;
+import com.dw.backend.doablewellbeingbackend.it.IntegrationTestBase;
 import com.dw.backend.doablewellbeingbackend.it.TestSeed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,12 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(properties = {
-        "app.security.jwt.secret=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-        "app.security.jwt.issuer=doable-wellbeing",
-        "app.security.jwt.roles-claim=roles"
-})
-class E2EFlowIT {
+@ActiveProfiles("test")
+class E2EFlowIT extends IntegrationTestBase {
 
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate jdbc;

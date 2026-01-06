@@ -13,7 +13,7 @@ description = 'DoableWellbeingBackend'
 sonar {
     properties {
 
-        property "sonar.projectKey", "DeltazorZz_Doable_Wellbeing"
+        property "sonar.projectKey", "doablewellbeing_token"
         property "sonar.organization", "deltazorzz"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.sourceEncoding", "UTF-8"
@@ -35,6 +35,15 @@ jacoco {
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
+    maxParallelForks = 1
+
+    systemProperty "spring.profiles.active", "test"
+
+    testLogging {
+        events "FAILED", "SKIPPED"
+        exceptionFormat "FULL"
+        showStandardStreams = true
+    }
 }
 
 jacocoTestReport {
@@ -93,6 +102,8 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.security:spring-security-test"
     testImplementation 'org.mockito:mockito-inline:5.2.0'
+
+
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 

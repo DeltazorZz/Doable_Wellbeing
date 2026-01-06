@@ -14,8 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.util.List;
@@ -25,6 +27,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@ActiveProfiles("test")
 class SlotServiceIT extends IntegrationTestBase {
 
     @Autowired SlotService slotService;
@@ -134,4 +137,5 @@ class SlotServiceIT extends IntegrationTestBase {
 
         assertThat(slots).isEmpty();
     }
+
 }

@@ -1,26 +1,29 @@
 package com.dw.backend.doablewellbeingbackend.it;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.TestInstance;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.containers.wait.strategy.Wait;
 
-@Testcontainers
+import java.time.Duration;
+
 @ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public abstract class IntegrationTestBase {
 
-    static final PostgreSQLContainer<?> POSTGRES =
+    private static final PostgreSQLContainer<?> POSTGRES =
             new PostgreSQLContainer<>("postgres:16-alpine")
                     .withDatabaseName("dw_test")
                     .withUsername("dw")
-                    .withPassword("dwpass");
+                    .withPassword("dwpass")
+                    .waitingFor(Wait.forListeningPort())
+                    .withStartupAttempts(3)
+                    .withStartupTimeout(Duration.ofSeconds(90));
 
     static {
-        POSTGRES.start(); // <-- EZ a kulcs: context load előtt indul
+        POSTGRES.start();
     }
 
     @DynamicPropertySource
