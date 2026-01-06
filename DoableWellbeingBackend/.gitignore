@@ -36,6 +36,18 @@ out/
 ### VS Code ###
 .vscode/
 
-### Google ###
-src/main/resources/secrets/
-**/secrets/
+# env files (ignore)
+.env
+.env.*
+**/.env
+**/.env.*
+
+# but keep examples/templates
+!.env.example
+!.env.template
+!**/.env.example
+!**/.env.template
+
+# backend secrets folder (ignore)
+DoableWellbeingBackend/src/main/resources/secrets/
+
