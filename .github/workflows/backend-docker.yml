@@ -68,6 +68,10 @@ jobs:
           java-version: 17
           cache: gradle
 
+      - name: Make gradlew executable
+        working-directory: DoableWellbeingBackend
+        run: chmod +x gradlew
+
       
       - name: Build + Test + Coverage
         working-directory: DoableWellbeingBackend
