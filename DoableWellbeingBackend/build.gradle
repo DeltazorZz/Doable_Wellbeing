@@ -12,10 +12,10 @@ description = 'DoableWellbeingBackend'
 
 sonar {
     properties {
-
-        property "sonar.projectKey", "doablewellbeing_token"
-        property "sonar.organization", "deltazorzz"
         property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.organization", System.getenv("SONAR_ORG") ?: "deltazorzz"
+        property "sonar.projectKey", System.getenv("SONAR_PROJECT_KEY") ?: "doablewellbeing"
+
         property "sonar.sourceEncoding", "UTF-8"
         property "sonar.sources", "src/main/java"
         property "sonar.tests", "src/test/java"
