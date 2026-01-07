@@ -70,6 +70,7 @@ jobs:
 
       
       - name: Build + Test + Coverage
+        working-directory: DoableWellbeingBackend
         env:
           SPRING_PROFILES_ACTIVE: test
         run: ./gradlew test jacocoTestReport --no-daemon
