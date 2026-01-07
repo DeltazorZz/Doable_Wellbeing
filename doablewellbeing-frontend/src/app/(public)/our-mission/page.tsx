@@ -1,6 +1,7 @@
 import Navbar from "@/app/components/navbar";
+import { CoachCard } from "@/app/components/ourMission/CoachCard";
 import { fetchCoaches, type Coach} from "@/lib/api/coachApi";
-import { CoachCard } from "@/app/components/ourMission/CoachCard.tsx";
+
 
 export default async function OurMissionPage() {
   let coaches: Coach[] = [];
