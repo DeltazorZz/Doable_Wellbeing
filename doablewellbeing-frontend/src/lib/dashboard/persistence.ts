@@ -1,134 +1,61 @@
-// lib/dashboard/persistence.ts
+// src/lib/dashboard/persistence.ts
 import type { Layout } from "react-grid-layout";
-import { WidgetRegistry, type WidgetType, type WidgetInstance } from "@/app/components/widgets";
-import { getDashboard, saveDashboard as saveDashboardApi, type DashboardApiDto, type LayoutsApiDto, type WidgetApiDto, type Breakpoint, } from "@/lib/api/dashboardApi";
+import type { Breakpoint, DashboardView, PlacementView } from "@/types/dashboard";
+
 export const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
-export const cols         = { lg: 12,   md: 10,  sm: 8,  xs: 6,   xxs: 4 };
+export const cols        = { lg: 12,   md: 10,  sm: 8,  xs: 6,   xxs: 4 };
+
 export type Layouts = Partial<Record<Breakpoint, Layout[]>>;
-
-const DEFAULT_WIDGETS_API: WidgetApiDto[] = [
-  { id: "habit-streak", type: "HabitStreak", title: "Habit streaks", settings: null },
-];
-
-export const DEFAULT_LAYOUTS: Layouts = {
-  lg: [
-    { i: "habit-streak", x: 0, y: 0, w: 4, h: 6, minW: 3, minH: 4 },
-  ],
-};
-
-function isWidgetType(x: string): x is WidgetType {
-  return x in WidgetRegistry;
-}
-
-function toInstance(w: WidgetApiDto): WidgetInstance | null {
-  if (!w || typeof w.id !== "string" || typeof w.type !== "string") return null;
-  if (!isWidgetType(w.type)) return null;
-  return { id: w.id, type: w.type, title: w.title ?? undefined };
-}
-
-function fromInstance(w: WidgetInstance): WidgetApiDto {
-  return {
-    id: w.id,
-    type: w.type,
-    title: w.title ?? null,
-    settings: null, 
-}
-}
 
 const ALL_BPS: Breakpoint[] = ["lg", "md", "sm", "xs", "xxs"];
 
-function parseLayouts(api: LayoutsApiDto | null | undefined): Layouts {
+function placementToLayout(widgetId: string, p: PlacementView): Layout {
+  return {
+    i: widgetId,
+    x: p.x,
+    y: p.y,
+    w: p.w,
+    h: p.h,
+    minW: p.minW ?? undefined,
+    minH: p.minH ?? undefined,
+    maxW: p.maxW ?? undefined,
+    maxH: p.maxH ?? undefined,
+    static: p.isStatic ?? undefined,
+  };
+}
+
+export function dashboardToLayouts(dashboard: DashboardView): Layouts {
   const result: Layouts = {};
 
-  if (!api) return result;
-
   for (const bp of ALL_BPS) {
-    const raw = api[bp];
-    if (!raw) continue;
+    const layoutsForBp: Layout[] = [];
 
-    try {
-      const arr = JSON.parse(raw) as Layout[];
-      if (Array.isArray(arr)) {
-        result[bp] = arr;
-      }
-    } catch {
+    for (const w of dashboard.widgets) {
+      const p = w.placements?.[bp];
+      if (!p) continue;
+      layoutsForBp.push(placementToLayout(w.id, p));
     }
+
+    if (layoutsForBp.length > 0) result[bp] = layoutsForBp;
   }
 
   return result;
 }
 
-function stringifyLayouts(layouts: Layouts): LayoutsApiDto {
-  const api: LayoutsApiDto = {
-    lg: null,
-    md: null,
-    sm: null,
-    xs: null,
-    xxs: null,
-  };
-
-  for (const bp of ALL_BPS) {
-    const arr = layouts[bp];
-    if (arr && arr.length > 0) {
-      api[bp] = JSON.stringify(arr);
-    }
-  }
-
-  return api;
-}
-
-
-export interface DashboardState {
-  widgets: WidgetInstance[];
-  layouts: Layouts;
-}
-
-
-export async function loadDashboard(): Promise<DashboardState> {
-  const fallbackWidgets = DEFAULT_WIDGETS_API
-    .map(toInstance)
-    .filter(Boolean) as WidgetInstance[];
-
-  const fallbackLayouts = DEFAULT_LAYOUTS;
-
-  try {
-    const dto: DashboardApiDto = await getDashboard();
-
-    const layoutsParsed = parseLayouts(dto.layouts);
-    const layouts =
-      Object.keys(layoutsParsed).length > 0 ? layoutsParsed : DEFAULT_LAYOUTS;
-
-    const widgetsRaw =
-      dto.widgets && dto.widgets.length > 0
-        ? dto.widgets
-        : DEFAULT_WIDGETS_API;
-
-    const widgets = widgetsRaw
-      .map(toInstance)
-      .filter(Boolean) as WidgetInstance[];
-
-    return { widgets, layouts };
-  } catch {
-    return { widgets: fallbackWidgets, layouts: fallbackLayouts };
-  }
-}
-
-export async function saveDashboard(
-  widgets: WidgetInstance[],
-  layouts: Layouts,
-): Promise<void> {
-  const payload: DashboardApiDto = {
-    name: "My dashboard", 
-    layouts: stringifyLayouts(layouts),
-    widgets: widgets.map(fromInstance),
-  };
-
-  try {
-    await saveDashboardApi(payload);
-  } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
-     
-      console.warn("Failed to save dashboard", err);
-    }
-  }
+export function layoutsToPlacementUpdates(
+  breakpoint: Breakpoint,
+  layouts: Layout[]
+): Array<{ widgetId: string } & PlacementView> {
+  return layouts.map(l => ({
+    widgetId: l.i,
+    x: l.x ?? 0,
+    y: l.y ?? 0,
+    w: l.w ?? 1,
+    h: l.h ?? 1,
+    minW: l.minW ?? null,
+    minH: l.minH ?? null,
+    maxW: (l as any).maxW ?? null,
+    maxH: (l as any).maxH ?? null,
+    isStatic: (l as any).static ?? null,
+  }));
 }
