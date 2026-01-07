@@ -1,5 +1,4 @@
 import Navbar from "@/app/components/navbar";
-import { CoachCard } from "@/app/components/ourMission/CoachCard";
 import { fetchCoaches, type Coach} from "@/lib/api/coachApi";
 
 
@@ -33,20 +32,12 @@ export default async function OurMissionPage() {
       </section>
 
       <main className="p-10 bg-white min-h-screen rounded-t-3xl shadow-2xl -mt-12">
-        {validCoaches.length === 0 ? (
           <div className="max-w-2xl mx-auto rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center">
             <div className="text-lg font-semibold text-slate-900">No coaches available</div>
             <div className="mt-2 text-sm text-slate-600">
               Please check back later — we’re onboarding more coaches.
             </div>
           </div>
-        ) : (
-          <div className="flex flex-wrap gap-10 justify-center">
-            {validCoaches.map((coach) => (
-              <CoachCard key={coach.id} coach={coach} />
-            ))}
-          </div>
-        )}
       </main>
     </>
   );
