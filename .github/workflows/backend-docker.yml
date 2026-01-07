@@ -24,6 +24,13 @@ jobs:
       - name: Docker info (Testcontainers)
         run: docker info
 
+      - name: Connectivity check (Maven Central)
+        run: |
+          curl -I https://repo.maven.apache.org/maven2/ | head -n 5
+          curl -I https://repo1.maven.org/maven2/ | head -n 5
+          curl -I https://services.gradle.org/distributions/gradle-8.14.3-bin.zip | head -n 5
+
+
       - name: Make gradlew executable
         working-directory: DoableWellbeingBackend
         run: chmod +x gradlew
