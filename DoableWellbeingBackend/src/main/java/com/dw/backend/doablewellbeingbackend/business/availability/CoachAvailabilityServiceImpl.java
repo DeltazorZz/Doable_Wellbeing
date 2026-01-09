@@ -43,8 +43,6 @@ public class CoachAvailabilityServiceImpl implements CoachAvailabilityService {
             CoachAvailability entity = CoachAvailability.builder()
                     .coachId(coachId)
                     .date(date)
-                    // ha az entitásban még van weekday mező, töltsük is ki:
-                    // .weekday(date.getDayOfWeek().getValue())
                     .startTime(request.getStartTime())
                     .endTime(request.getEndTime())
                     .isRecurring(recurring)

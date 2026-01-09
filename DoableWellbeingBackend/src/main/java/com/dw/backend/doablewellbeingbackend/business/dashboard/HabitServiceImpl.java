@@ -29,7 +29,7 @@ public class HabitServiceImpl implements HabitService {
             throw new IllegalArgumentException("Habit title must be at least 3 characters long");
         }
 
-        // duplikáció védelem user szinten
+
         boolean exists = habitRepository.existsByUserIdAndTitleIgnoreCase(userId, title);
         if (exists) {
             throw new IllegalArgumentException("Habit with this title already exists");

@@ -22,7 +22,7 @@ public class SlotServiceImpl implements SlotService {
     private final CoachAvailabilityRepository availabilityRepository;
     private final AppointmentRepository appointmentRepository;
 
-    // ha van dedikált app timeZone-od, tedd be configból
+
     private static final ZoneId zoneId = ZoneId.of("Europe/London");
 
     @Override
@@ -45,7 +45,7 @@ public class SlotServiceImpl implements SlotService {
             return List.of();
         }
 
-        // meglévő foglalások lekérése
+
         OffsetDateTime fromDateTime = fromDate.atStartOfDay(coachZone).toOffsetDateTime();
         OffsetDateTime toDateTime = toDate.plusDays(1).atStartOfDay(coachZone).toOffsetDateTime();
 
@@ -89,8 +89,7 @@ public class SlotServiceImpl implements SlotService {
             while (!cursor.plus(slotLen).isAfter(end)) {
                 LocalTime slotEndTime = cursor.plus(slotLen);
 
-                // Itt érdemes lenne a coach timezone alapján kiszámolt offsetet használni,
-                // de a lényeg, hogy konzisztens legyen az appointments-szel.
+
                 ZoneOffset offset = coachZone.getRules().getOffset(Instant.now());
 
                 OffsetDateTime slotStart = OffsetDateTime.of(date, cursor, offset);

@@ -85,7 +85,6 @@ public class WidgetDataServiceImpl implements WidgetDataService {
         );
 
         var sessions = appts.stream().map(a -> {
-            // Notes -> coachSummary (MVP: join all notes)
             var notes = appointmentNoteRepository.findByAppointmentIdOrderByCreatedAtAsc(a.getId());
             String summary = notes.isEmpty()
                     ? null
@@ -95,7 +94,7 @@ public class WidgetDataServiceImpl implements WidgetDataService {
                     .reduce((x, y) -> x + "\n\n" + y)
                     .orElse(null);
 
-            // Resources -> files
+
             var res = appointmentResourceRepository.findByAppointmentIdOrderByCreatedAtDesc(a.getId());
             var files = res.stream().map(r -> new CompletedMeetingsWidgetData.ResourceFile(
                     r.getId().toString(),

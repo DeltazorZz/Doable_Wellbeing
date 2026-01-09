@@ -26,9 +26,6 @@ public class AppointmentNoteEntity {
     @Column(name = "appointment_id", nullable = false, columnDefinition = "uuid")
     private UUID appointmentId;
 
-    /**
-     * Coach user_id
-     */
     @Column(name = "created_by", nullable = false, columnDefinition = "uuid")
     private UUID createdBy;
 

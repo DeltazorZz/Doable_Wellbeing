@@ -22,7 +22,7 @@ public record AppUserImpl(
         if (passwordSalt != null) {
             passwordSalt = passwordSalt.clone();
         }
-        // roles-ból nem-módosítható lista
+
         roles = (roles == null) ? List.of() : List.copyOf(roles);
     }
 

@@ -22,22 +22,18 @@ public class PasswordHashingService {
     @Value("${app.security.password.pepper:}")
     private String pepper;
 
-    /**
-     * Generates a new random salt for a user (16 bytes)
-     */
+
     public byte[] generateSalt() {
         byte[] salt = new byte[SALT_LENGTH_BYTES];
         random.nextBytes(salt);
         return salt;
     }
 
-    /**
-     * Hash a password using PBKDF2WithHmacSHA256 + salt + optional pepper
-     */
+
     public String hash(char[] password, byte[] salt) {
         char[] withPepper = null;
         try {
-            // combine password + pepper
+
             if (pepper != null && !pepper.isBlank()) {
                 withPepper = (new String(password) + pepper).toCharArray();
             } else {
@@ -48,13 +44,12 @@ public class PasswordHashingService {
             SecretKeyFactory skf = SecretKeyFactory.getInstance(ALGORITHM);
             byte[] derived = skf.generateSecret(spec).getEncoded();
 
-            // encode hash to Base64 for varchar column storage
             return Base64.getEncoder().encodeToString(derived);
 
         } catch (Exception e) {
             throw new IllegalStateException("Error while hashing password", e);
         } finally {
-            // clear password data from memory
+
             if (withPepper != null) Arrays.fill(withPepper, '\0');
             Arrays.fill(password, '\0');
         }

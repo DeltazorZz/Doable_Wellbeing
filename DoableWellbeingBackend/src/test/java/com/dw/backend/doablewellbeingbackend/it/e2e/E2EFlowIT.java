@@ -61,14 +61,14 @@ class E2EFlowIT extends IntegrationTestBase {
 
     @BeforeEach
     void seed() throws Exception {
-        // roles
+
         TestSeed.ensureCoreRoles(jdbc);
 
-        // modules (dashboardhoz)
+
         TestSeed.ensureModule(jdbc, "upcoming_meetings", "Upcoming meetings", "Your next sessions");
         TestSeed.ensureModule(jdbc, "mood_chart", "Mood chart", "Mood points");
 
-        // users (random email -> no duplicate)
+
         coachId = TestSeed.insertUser(
                 jdbc,
                 "coach_e2e_" + UUID.randomUUID() + "@test.com",
@@ -86,15 +86,14 @@ class E2EFlowIT extends IntegrationTestBase {
                 "E2E"
         );
 
-        // roles + coach/client rows
-        TestSeed.insertCoach(jdbc, coachId);     // coach role + coaches row
-        TestSeed.insertClient(jdbc, userId);     // nálad user role a "client" helyett is ok
 
-        // tokens
+        TestSeed.insertCoach(jdbc, coachId);
+        TestSeed.insertClient(jdbc, userId);
+
+
         coachToken = mintToken(coachId, List.of("coach"));
         userToken  = mintToken(userId,  List.of("user"));
 
-        // Google calendar mock
         Event e = new Event();
         e.setId("evt-x");
         e.setHangoutLink("https://meet.google.com/test");
@@ -107,7 +106,7 @@ class E2EFlowIT extends IntegrationTestBase {
     void e2e_availability_slots_booking_and_dashboard_flow() throws Exception {
         // ------------------------------------------------------------
         // 1) COACH creates availability
-        // POST /api/coach/availabilities/me  (ROLE_coach)
+        // POST /api/coach/availabilities/me
         // ------------------------------------------------------------
         LocalDate date = LocalDate.now().plusDays(2);
         String createAvailabilityBody = """
@@ -126,7 +125,7 @@ class E2EFlowIT extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createAvailabilityBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").exists()); // CoachAvailabilityView tipikusan id-val jön
+                .andExpect(jsonPath("$[0].id").exists());
 
         // ------------------------------------------------------------
         // 2) USER fetches slots for coach
@@ -148,7 +147,7 @@ class E2EFlowIT extends IntegrationTestBase {
         // ------------------------------------------------------------
         // 3) USER books from slot
         // POST /api/appointments/slots/book
-        // roles: user/client/coach (a controllered szerint)
+        // roles: user/client/coach
         // ------------------------------------------------------------
         String bookBody = """
             {
@@ -208,7 +207,7 @@ class E2EFlowIT extends IntegrationTestBase {
 
         UUID widgetId = UUID.fromString(om.readTree(addRes).path("widgetId").asText());
 
-        // update settings
+
         String updateSettingsBody = """
             { "settings": { "showDaysAhead": 7 } }
         """;

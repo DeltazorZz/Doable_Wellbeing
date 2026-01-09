@@ -92,8 +92,7 @@ class AppointmentControllerIT extends IntegrationTestBase {
         mvc.perform(post("/appointments/slots/book")
                         .with(jwt()
                                 .jwt(j -> j.subject(clientId.toString()))
-                                // a te security-d lehet roles claimből dolgozik;
-                                // Spring Security testben legegyszerűbb: authorities
+
                                 .authorities(() -> "ROLE_client")
                         )
                         .contentType(MediaType.APPLICATION_JSON)

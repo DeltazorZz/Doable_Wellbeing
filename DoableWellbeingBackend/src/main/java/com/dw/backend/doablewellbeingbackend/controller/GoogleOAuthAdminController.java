@@ -24,12 +24,12 @@ import java.util.Map;
 @ConditionalOnProperty(prefix = "google.calendar", name = "enabled", havingValue = "true")
 public class GoogleOAuthAdminController {
 
-    // This matches the constructor signature that takes explicit auth URL
+
     private static final String AUTH_BASE_URL = "https://accounts.google.com/o/oauth2/auth";
 
     private static final String TOKEN_URL = "https://oauth2.googleapis.com/token";
 
-    // Calendar scopes to create/manage events
+
     private static final List<String> SCOPES = List.of(
             "https://www.googleapis.com/auth/calendar.events"
     );
@@ -43,15 +43,9 @@ public class GoogleOAuthAdminController {
     @Value("${google.oauth.redirect-uri}")
     private String redirectUri;
 
-    /**
-     * Step 1: Redirect the browser to Google OAuth consent screen.
-     *
-     * Call this in your browser: GET /admin/google/oauth/start
-     */
     @GetMapping("/start")
     public ResponseEntity<Void> startOAuthFlow() {
 
-        // Use the 4-arg constructor: (authUrl, clientId, redirectUri, scopes)
         GoogleAuthorizationCodeRequestUrl url =
                 new GoogleAuthorizationCodeRequestUrl(
                         AUTH_BASE_URL,
@@ -67,13 +61,6 @@ public class GoogleOAuthAdminController {
         return ResponseEntity.status(302).headers(headers).build();
     }
 
-    /**
-     * Step 2: Google redirects back here with ?code=...
-     *
-     * This endpoint exchanges the "code" for an access_token + refresh_token,
-     * and then returns the refresh_token in the response so you can copy-paste it
-     * into your application.yml.
-     */
     @GetMapping("/callback")
     public ResponseEntity<?> handleCallback(
             @RequestParam(name = "code", required = false) String code,

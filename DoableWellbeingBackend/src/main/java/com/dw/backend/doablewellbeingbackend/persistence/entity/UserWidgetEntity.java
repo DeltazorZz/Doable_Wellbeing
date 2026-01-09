@@ -23,11 +23,11 @@ public class UserWidgetEntity {
     @Column(name="user_id", nullable=false, columnDefinition="uuid")
     private UUID userId;
 
-    @Column(nullable=false) private String type; // pl. HabitStreak
+    @Column(nullable=false) private String type;
     private String title;
 
     @Column(nullable=false, columnDefinition="jsonb")
-    private String settings = "{}"; // szerver oldalt String-ként tároljuk
+    private String settings = "{}";
 
     @Column(name="is_active", nullable=false) private boolean active = true;
 

@@ -11,7 +11,6 @@ public interface UserService {
 
 
     // Create User
-    //CreateUserResponse createUser(CreateUserRequest request);
     AppUser createUser(String email, String passwordHash, byte[] passwordSalt, String firstName, String lastName);
     AppUser createCoach(String email, String passwordHash, byte[] passwordSalt, String firstName, String lastName);
 
@@ -20,17 +19,14 @@ public interface UserService {
     User getById(UUID id);
 
     // Get Users
-
     Page<User> getAllActive(Pageable pageable);
     Page<User> getAll(Pageable pageable);
 
 
     // Update User
-
     void update(UUID id, UpdateUserRequest req);
 
     // Delete User
-
     void delete(UUID id);
 
     // Validation

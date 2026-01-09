@@ -47,7 +47,7 @@ public class DashboardWidgetEntity {
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    // optional legacy mapping, keep it if DB has it
+
     @Column(name = "legacy_user_widget_id", columnDefinition = "uuid")
     private UUID legacyUserWidgetId;
 
