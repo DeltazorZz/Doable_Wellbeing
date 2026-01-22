@@ -78,14 +78,11 @@ public class DashboardServiceImpl implements DashboardService {
 
         widget = widgetRepository.save(widget);
 
-        // Optional placement: create a default placement if none supplied by FE
+
         Breakpoint bp = parseBreakpointOrDefault(request.breakpoint());
 
         int w = request.w() != null ? request.w() : 4;
         int h = request.h() != null ? request.h() : 3;
-
-        // x,y: if FE doesn't provide, place at (0, very low priority) → y = 0 for now
-        // In Gridstack, you can also allow it to auto-place; backend can just store 0,0 and FE can re-pack.
         int x = request.x() != null ? request.x() : 0;
         int y = request.y() != null ? request.y() : 0;
 
@@ -168,11 +165,11 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional
     public void updateWidgetSettings(UUID userId, UUID dashboardId, UUID widgetId, UpdateWidgetSettingsRequest request) {
-        // Ensure dashboard belongs to user
+
         DashboardEntity dashboard = dashboardRepository.findByIdAndUserId(dashboardId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Dashboard not found or access denied"));
 
-        // Ensure widget belongs to dashboard
+
         DashboardWidgetEntity widget = widgetRepository.findByIdAndDashboardId(widgetId, dashboard.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Widget not found in this dashboard"));
 

@@ -16,7 +16,7 @@ public class UserRoleId implements Serializable {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    // Ha roles.id INT (IDENTITY), akkor Integer/Long
+
     @Column(name = "role_id", nullable = false)
     private Integer roleId;
 }

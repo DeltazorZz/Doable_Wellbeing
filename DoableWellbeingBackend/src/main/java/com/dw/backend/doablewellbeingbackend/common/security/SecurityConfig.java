@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers(
-                                "/auth/login", "/auth/register", "/auth/refresh", "/auth/logout", "auth/registerCoach", "/csrf-token","/admin/google/oauth/**"
+                                "/auth/login", "/auth/register", "/auth/refresh", "/auth/logout", "auth/registerCoach", "/csrf-token","/admin/google/oauth/**", "/api/test/**"
                         )
                 )
                 .cors(cors -> {})
@@ -72,7 +72,8 @@ public class SecurityConfig {
                                 "/auth/refresh",
                                 "/auth/logout",
                                 "/auth/register",
-                                "/auth/registerCoach"
+                                "/auth/registerCoach",
+                                "/api/test/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/csrf-token","/admin/google/oauth/**").permitAll()
                         .anyRequest().authenticated()

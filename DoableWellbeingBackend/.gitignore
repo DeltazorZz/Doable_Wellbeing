@@ -39,7 +39,7 @@ out/
 # env files (ignore)
 .env
 .env.*
-**/.env
+.env
 **/.env.*
 
 # but keep examples/templates

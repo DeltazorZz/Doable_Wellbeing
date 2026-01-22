@@ -45,7 +45,6 @@ public class UserServiceImpl implements UserService {
     }
 
     // ----- Create User -----
-
     @Override
     public AppUser createUser(String email, String passwordHash, byte[] passwordSalt, String firstName, String lastName) {
         Objects.requireNonNull(passwordHash, "passwordHash");
@@ -75,7 +74,7 @@ public class UserServiceImpl implements UserService {
         Objects.requireNonNull(passwordHash, "passwordHash");
         Objects.requireNonNull(passwordSalt, "passwordSalt");
 
-        // 1) User létrehozása
+
         UserEntity u = new UserEntity();
         u.setEmail(email);
         u.setPasswordHash(passwordHash);
@@ -92,7 +91,6 @@ public class UserServiceImpl implements UserService {
 
         UserEntity savedUser = userRepository.save(u);
 
-        // 2) Coach rekord létrehozása a coaches táblában
         CoachEntity coach = CoachEntity.builder()
                 .user(savedUser)
                 .timezone("Europe/London")
@@ -102,7 +100,6 @@ public class UserServiceImpl implements UserService {
 
         coachRepository.save(coach);
 
-        // 3) Visszatérés AppUser-ként
         return toAppUser(savedUser);
     }
 

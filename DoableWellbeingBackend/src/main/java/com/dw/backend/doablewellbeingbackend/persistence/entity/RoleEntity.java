@@ -13,5 +13,5 @@ public class RoleEntity {
     private Integer id;
 
     @Column(nullable = false, updatable = false)
-    private String name; // pl. USER, COACH, ADMIN
+    private String name;
 }

@@ -23,10 +23,10 @@ public class WheelScoreEntity {
     private UUID userId;
 
     @Column(nullable = false)
-    private String area; // health, work, relationships...
+    private String area;
 
     @Column(nullable = false)
-    private int score; // 1–10
+    private int score;
 
     @Column(name = "scored_at", nullable = false)
     private OffsetDateTime scoredAt;

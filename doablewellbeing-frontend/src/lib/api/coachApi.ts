@@ -9,5 +9,9 @@ export type Coach = {
 };
 
 export async function fetchCoaches(): Promise<Coach[]> {
-    return await apiFetch<Coach[]>("/api/coaches");
+    const result = await apiFetch<Coach[]>("/api/coaches");
+    if (!result.ok) {
+        throw new Error(result.errorText || "Failed to fetch coaches");
+    }
+    return result.data;
 }

@@ -81,9 +81,6 @@ export function AvailabilityCalendar({
         })}
       </div>
 
-      <div className="mt-4 text-xs text-slate-500">
-        Tip: later we can add dots for every day that has availability.
-      </div>
     </div>
   );
 }

@@ -29,7 +29,7 @@ public class MicroHabitCatalogEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false)
-    private String tags; // JSON array string
+    private String tags;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;

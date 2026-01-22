@@ -272,6 +272,14 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private void attachGoogleMeetToAppointment(AppointmentEntity appt) throws IOException {
 
+        if (!googleCalendarService.isEnabled) {
+            appt.setExternalCalendarProvider("google");
+            appt.setMeetingUrl("https://meet.google.com/test-meeting");
+            appt.setExternalCalendarId("test");
+            return;
+        }
+
+
         UserEntity client = userRepo.findById(appt.getClientId())
                 .orElseThrow(() -> new NotFoundException("Client not found"));
 

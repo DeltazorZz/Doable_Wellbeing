@@ -56,8 +56,7 @@ public interface AppointmentService {
     UUID addResource(UUID coachId, UUID appointmentId, AddAppointmentResourceRequest req);
 
 
-//    // Add session Note
-//    void noShow(UUID coachId, UUID appointmentId);
+
 
 
 }

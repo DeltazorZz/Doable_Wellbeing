@@ -26,9 +26,6 @@ public class AppointmentResourceEntity {
     @Column(name = "appointment_id", nullable = false, columnDefinition = "uuid")
     private UUID appointmentId;
 
-    /**
-     * Coach user_id
-     */
     @Column(name = "uploaded_by", nullable = false, columnDefinition = "uuid")
     private UUID uploadedBy;
 
@@ -41,10 +38,6 @@ public class AppointmentResourceEntity {
     @Column(name = "size_bytes")
     private Long sizeBytes;
 
-    /**
-     * For now: public or signed URL.
-     * Later: storage_key + signed URL endpoint.
-     */
     @Column(name = "url", columnDefinition = "text")
     private String url;
 

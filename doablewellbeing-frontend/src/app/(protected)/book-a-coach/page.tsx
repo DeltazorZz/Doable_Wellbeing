@@ -70,13 +70,18 @@ export default function AppointmentBookingPage() {
     async function loadSlots() {
       try {
         // from = to = selectedDate, pl. 60 perces slotok
-        const data = await getCoachSlots(
+        const result = await getCoachSlots(
           selectedCoach,
           selectedDate,
           selectedDate,
           60
         );
-        setSlots(data);
+        if (result.ok) {
+          setSlots(result.data);
+        } else {
+          console.error("Failed to load slots", result.errorText);
+          setSlots([]);
+        }
       } catch (err) {
         console.error("Failed to load slots", err);
         setSlots([]);
@@ -111,13 +116,18 @@ export default function AppointmentBookingPage() {
       );
       const combinedNotes = combinedNotesParts.join("\n");
 
-      const appt: AppointmentView = await bookAppointmentFromSlotInstant({
+      const result = await bookAppointmentFromSlotInstant({
         coachId: selectedCoach,
         slotStart: startDate.toISOString(),
         durationMinutes: durationMinutes,
         notes: combinedNotes || undefined,
       });
-   
+
+      if (!result.ok) {
+        throw new Error(result.errorText || "Failed to book appointment");
+      }
+
+      const appt = result.data;
 
       setMessage(
         `Your session is booked for ${new Date(

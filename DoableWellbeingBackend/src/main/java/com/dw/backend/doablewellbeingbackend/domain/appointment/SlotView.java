@@ -13,8 +13,6 @@ public class SlotView {
     LocalDate date;
     LocalTime startTime;
     LocalTime endTime;
-
-    //Absolute value
     OffsetDateTime startsAt;
     OffsetDateTime endsAt;
 }

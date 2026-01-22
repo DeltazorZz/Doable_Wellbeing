@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -67,6 +69,8 @@ class AppointmentControllerIT extends IntegrationTestBase {
         }
     }
 
+
+
     @Test
     void bookFromSlot_requiresAuth() throws Exception {
         mvc.perform(post("/appointments/slots/book")
@@ -92,8 +96,7 @@ class AppointmentControllerIT extends IntegrationTestBase {
         mvc.perform(post("/appointments/slots/book")
                         .with(jwt()
                                 .jwt(j -> j.subject(clientId.toString()))
-                                // a te security-d lehet roles claimből dolgozik;
-                                // Spring Security testben legegyszerűbb: authorities
+
                                 .authorities(() -> "ROLE_client")
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,4 +105,5 @@ class AppointmentControllerIT extends IntegrationTestBase {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.coachId").value(coachId.toString()));
     }
+
 }

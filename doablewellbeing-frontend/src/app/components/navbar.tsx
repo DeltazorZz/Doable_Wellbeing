@@ -20,7 +20,7 @@ const NAV = [
   { href: "/", label: "Home" },
   { href: "/our-mission", label: "Our Mission" },
   { href: "/library", label: "Library" },
-  { href: "/book-a-coach", label: "Book a coach" },
+  
 ];
 
 export default function Navbar({
@@ -69,8 +69,7 @@ export default function Navbar({
   if (user?.roles?.includes("user")) {
   extraNav.push( 
     { href: "/dashboard", label: "Dashboard" },
-    { href: "/habits", label: "Habits" },
-    { href: "/appointments", label: "Appointments" },
+    { href: "/book-a-coach", label: "Book a coach" },
   );
 }
 
