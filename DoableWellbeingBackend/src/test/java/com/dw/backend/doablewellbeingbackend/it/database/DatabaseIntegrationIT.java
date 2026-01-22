@@ -76,7 +76,7 @@ class DatabaseIntegrationIT extends IntegrationTestBase {
         );
 
         OffsetDateTime start = OffsetDateTime.now().plusDays(2).withSecond(0).withNano(0);
-        OffsetDateTime endSameOrBefore = start; 
+        OffsetDateTime endSameOrBefore = start;
 
         assertThatThrownBy(() -> jdbc.update(
                 "insert into appointments(id, coach_id, client_id, starts_at, ends_at, status) values (?, ?, ?, ?, ?, 'scheduled')",
