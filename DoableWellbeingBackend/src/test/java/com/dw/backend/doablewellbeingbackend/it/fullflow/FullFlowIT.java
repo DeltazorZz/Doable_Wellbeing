@@ -1,4 +1,4 @@
-package com.dw.backend.doablewellbeingbackend.it.e2e;
+package com.dw.backend.doablewellbeingbackend.it.fullflow;
 
 import com.dw.backend.doablewellbeingbackend.business.google.GoogleCalendarService;
 import com.dw.backend.doablewellbeingbackend.it.IntegrationTestBase;
@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -40,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class E2EFlowIT extends IntegrationTestBase {
+class FullFlowIT extends IntegrationTestBase {
 
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate jdbc;
@@ -106,7 +105,6 @@ class E2EFlowIT extends IntegrationTestBase {
     void e2e_availability_slots_booking_and_dashboard_flow() throws Exception {
         // ------------------------------------------------------------
         // 1) COACH creates availability
-        // POST /api/coach/availabilities/me
         // ------------------------------------------------------------
         LocalDate date = LocalDate.now().plusDays(2);
         String createAvailabilityBody = """
@@ -129,7 +127,6 @@ class E2EFlowIT extends IntegrationTestBase {
 
         // ------------------------------------------------------------
         // 2) USER fetches slots for coach
-        // GET /api/coach/availabilities/{coachId}/slots?from&to&slotLengthMinutes
         // roles: user/coach/client
         // ------------------------------------------------------------
         String slotsJson = mvc.perform(get(AV_BASE + "/{coachId}/slots", coachId)
@@ -146,7 +143,6 @@ class E2EFlowIT extends IntegrationTestBase {
 
         // ------------------------------------------------------------
         // 3) USER books from slot
-        // POST /api/appointments/slots/book
         // roles: user/client/coach
         // ------------------------------------------------------------
         String bookBody = """

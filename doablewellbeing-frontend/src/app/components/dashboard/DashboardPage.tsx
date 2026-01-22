@@ -8,8 +8,16 @@ import { DashboardGrid } from "./DashboardGrid";
 import { AddWidgetModal } from "./AddwidgetModal";
 import type { DashboardWidgetView } from "@/types/dashboard";
 import { getDefaultWidgetSettings } from "./defaultWidgetSettings";
+import { useRequireAuth } from "@/lib/hooks/useRequiredAuth";
 
 export function DashboardPage() {
+  const ready = useRequireAuth();
+
+  if (!ready) {
+    // lehet spinner is
+    return null;
+  }
+
   const { dashboard, setDashboard, loading, error, reload } = useDashboard();
   const { modules, loading: modulesLoading } = useModules();
 

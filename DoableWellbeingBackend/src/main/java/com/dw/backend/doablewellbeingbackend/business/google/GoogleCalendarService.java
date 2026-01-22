@@ -32,6 +32,9 @@ public class GoogleCalendarService {
     private final HttpTransport httpTransport = new NetHttpTransport();
     private final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
+    @Value("${google.calendar.enabled}")
+    public boolean isEnabled;
+
     @Value("${google.calendar.application-name}")
     private String applicationName;
 

@@ -64,7 +64,6 @@ public class UserController {
     }
 
 
-
     @PatchMapping("/appointment/{id}/cancel")
     public AppointmentView cancelMyAppointment(
             @PathVariable UUID id,
